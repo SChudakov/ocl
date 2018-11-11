@@ -48,13 +48,14 @@
                         <configuration>
                             <outputDirectory>src/main/java</outputDirectory>
                             <lexDefinitions>
-                                <lexDefinition>src\main\resources\claculator.jflex</lexDefinition>
+                                <!--<lexDefinition>src\main\resources\claculator.jflex</lexDefinition>-->
+                                <lexDefinition>src\main\resources\ocl.jflex</lexDefinition>
                             </lexDefinitions>
                         </configuration>
                     </execution>
                 </executions>
-
             </plugin>
+
 
             <!--plugin for cup-->
             <plugin>
@@ -62,19 +63,31 @@
                 <artifactId>cup-maven-plugin</artifactId>
                 <version>11b-20160615</version>
                 <executions>
+                    <!--<execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <className>CalculatorParser</className>
+                            <symbolsName>CalculatorSymbol</symbolsName>
+                            <packageName>com.ocl.parser</packageName>
+                            <cupDefinition>src\main\resources\calculator.cup</cupDefinition>
+                            <outputDirectory>src/main/java</outputDirectory>
+                        </configuration>
+                    </execution>-->
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
+                        <configuration>
+                            <className>OCLParser</className>
+                            <symbolsName>OCLSymbol</symbolsName>
+                            <packageName>com.ocl.parser</packageName>
+                            <cupDefinition>src\main\resources\ocl.cup</cupDefinition>
+                            <outputDirectory>src/main/java</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <className>CalculatorParser</className>
-                    <symbolsName>CalculatorSymbol</symbolsName>
-                    <packageName>com.ocl.parser</packageName>
-                    <cupDefinition>src\main\resources\calculator.cup</cupDefinition>
-                    <outputDirectory>src/main/java</outputDirectory>
-                </configuration>
             </plugin>
         </plugins>
     </build>

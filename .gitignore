@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/java,linux,maven,intellij+all
 # Edit at https://www.gitignore.io/?templates=java,linux,maven,intellij+all
 
@@ -136,3 +135,6 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 # End of https://www.gitignore.io/api/java,linux,maven,intellij+all
+
+src/main/java/com/ocl/parser/
+src/main/java/com/ocl/scanner/

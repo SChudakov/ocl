@@ -1,0 +1,84 @@
+import java_cup.runtime.*;
+import com.ocl.scanner.CalculatorScanner;
+
+/* -----------------Parser Code Section----------------- */
+
+parser code {:
+    public void report_error(String message, Object info) {
+
+        StringBuilder m = new StringBuilder("Error");
+
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+
+            if (s.left >= 0) {
+                m.append(" in line "+(s.left+1));
+                if (s.right >= 0)
+                    m.append(", column "+(s.right+1));
+            }
+        }
+
+        m.append(" : "+message);
+
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+
+
+
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+
+terminal COMA,SEMICOLON, COLON, LPAREN, RPAREN,LCURLY_BRACE,RCURLY_BRACE,LSQUARE_BRACKET,RSQUARE_BRACKET;
+terminal PLUS, MINUS, MULTIPLICATION, DIVISION;
+terminal GR, GREQ, LE, LEQ, EQ, NEQ, EQEQ;
+terminal AND, OR, NOT, XOR;
+terminal OR_SYMBOL;
+terminal DOT, ARROW, DOUBLECOLON;
+terminal PRE_OPER, IMPLIES;
+terminal CONTEXT, INV,PRE,POST;
+terminal ATTR, BODY;
+terminal DEF, LET;
+terminal IF, THEN,ELSE,ENDIF;
+terminal PACKAGE, ENDPACKAGE;
+terminal IN, OPER;
+
+terminal Integer  INT;
+terminal Double   REAL;
+terminal String   STRING_LITERAL;
+terminal String  IDENTIFIER;
+terminal Boolean  BOOLEAN;
+
+non terminal Object     expr_list, expr_part;
+non terminal Integer    expr, factor, term;
+
+    expr_list ::= expr_list expr_part
+                     |
+                     expr_part;
+
+    expr_part ::= expr:e
+                     {: System.out.println(" = " + e); :}
+                     SEMICOLON
+                     ;
+    expr      ::= expr:e PLUS factor:f
+                     {: RESULT = new Integer(e.intValue() + f.intValue()); :}
+                     |
+                     expr:e MINUS factor:f
+                     {: RESULT = new Integer(e.intValue() - f.intValue()); :}
+                     |
+                     factor:f
+                     {: RESULT = new Integer(f.intValue()); :}
+                     ;
+    factor    ::= factor:f MULTIPLICATION term:t
+                     {: RESULT = new Integer(f.intValue() * t.intValue()); :}
+                     |
+                     factor:f DIVISION term:t
+                     {: RESULT = new Integer(f.intValue() / t.intValue()); :}
+                     |
+                     term:t
+                     {: RESULT = new Integer(t.intValue()); :}
+                     ;
