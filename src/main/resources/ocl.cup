@@ -38,6 +38,7 @@ terminal PLUS, MINUS, MULTIPLICATION, DIVISION;
 terminal GR, GREQ, LE, LEQ, EQ, NEQ, EQEQ;
 terminal AND, OR, NOT, XOR;
 terminal OR_SYMBOL;
+terminal HASHTAG, DOUBLEDOT, AT;
 terminal DOT, ARROW, DOUBLECOLON;
 terminal PRE_OPER, IMPLIES;
 terminal CONTEXT, INV,PRE,POST;
@@ -46,39 +47,148 @@ terminal DEF, LET;
 terminal IF, THEN,ELSE,ENDIF;
 terminal PACKAGE, ENDPACKAGE;
 terminal IN, OPER;
+terminal SET, BAG, SEQUENCE, COLLECTION;
+terminal ENUM;
 
-terminal Integer  INT;
-terminal Double   REAL;
-terminal String   STRING_LITERAL;
-terminal String  IDENTIFIER;
-terminal Boolean  BOOLEAN;
+terminal Integer    INT;
+terminal Double     REAL;
+terminal String     STRING_LITERAL;
+terminal String     IDENTIFIER;
+terminal String     TYPENAME;
+terminal Boolean    BOOLEAN;
 
 non terminal Object     expr_list, expr_part;
 non terminal Integer    expr, factor, term;
 
-    expr_list ::= expr_list expr_part
-                     |
-                     expr_part;
+non terminal expression;
+non terminal logical_expression;
+non terminal relational_expression;
+non terminal additive_expression;
+non terminal multiplicative_expression;
+non terminal unary_expression;
+non terminal postfix_expression;
+non terminal primary_expression;
+non terminal if_expression;
 
-    expr_part ::= expr:e
-                     {: System.out.println(" = " + e); :}
-                     SEMICOLON
-                     ;
-    expr      ::= expr:e PLUS factor:f
-                     {: RESULT = new Integer(e.intValue() + f.intValue()); :}
-                     |
-                     expr:e MINUS factor:f
-                     {: RESULT = new Integer(e.intValue() - f.intValue()); :}
-                     |
-                     factor:f
-                     {: RESULT = new Integer(f.intValue()); :}
-                     ;
-    factor    ::= factor:f MULTIPLICATION term:t
-                     {: RESULT = new Integer(f.intValue() * t.intValue()); :}
-                     |
-                     factor:f DIVISION term:t
-                     {: RESULT = new Integer(f.intValue() / t.intValue()); :}
-                     |
-                     term:t
-                     {: RESULT = new Integer(t.intValue()); :}
-                     ;
+non terminal feature_call_parameters;
+non terminal literal;
+non terminal enumeration_type;
+non terminal simple_type_Specifier;
+non terminal literal_collection;
+non terminal expression_list_or_range;
+non terminal feature_call;
+non terminal qualifiers;
+non terminal declarator;
+non terminal path_type_name;
+non terminal path_name;
+non terminal time_expression;
+non terminal actual_parameter_list;
+non terminal enumeration_list;
+non terminal expression_list;
+
+non terminal logical_operator;
+non terminal collection_kind;
+non terminal relational_operator;
+non terminal add_operator;
+non terminal multiply_operator;
+non terminal unary_operator;
+non terminal navigation_operator;
+
+
+
+
+
+    expression                  ::= logical_expression;
+    logical_expression          ::= relational_expression
+                                    |
+                                    logical_expression logical_operator logical_expression;
+    relational_expression       ::= additive_expression relational_operator additive_expression;
+    additive_expression         ::= multiplicative_expression
+                                    |
+                                    multiplicative_expression add_operator additive_expression;
+    multiplicative_expression   ::= unary_expression
+                                    |
+                                    unary_expression multiply_operator multiplicative_expression;
+    unary_expression            ::= postfix_expression
+                                    |
+                                    unary_operator unary_expression;
+    postfix_expression          ::= primary_expression
+                                    |
+                                    postfix_expression navigation_operator feature_call;
+    primary_expression          ::= literal_collection
+                                    |
+                                    literal
+                                    |
+                                    feature_call
+                                    |
+                                    LPAREN expression RPAREN
+                                    |
+                                    if_expression;
+    if_expression               ::= IF expression THEN expression ELSE expression ENDIF;
+    feature_call_parameters     ::= LPAREN declarator actual_parameter_list RPAREN
+                                    |
+                                    LPAREN actual_parameter_list RPAREN;
+    literal                     ::= STRING_LITERAL | INT | HASHTAG IDENTIFIER;
+    enumeration_list            ::= HASHTAG IDENTIFIER
+                                    |
+                                    HASHTAG IDENTIFIER enumeration_list;
+    enumeration_type            ::= ENUM LCURLY_BRACE enumeration_list RCURLY_BRACE;
+    simple_type_Specifier       ::= path_type_name | enumeration_type;
+    literal_collection          ::= collection_kind LCURLY_BRACE RCURLY_BRACE
+                                    |
+                                    collection_kind LCURLY_BRACE expression_list_or_range RCURLY_BRACE;
+    expression_list_or_range    ::= expression DOUBLEDOT expression
+                                    |
+                                    expression_list;
+    expression_list             ::= expression
+                                    |
+                                    expression COMA expression_list;
+    feature_call                ::= path_name
+                                    |
+                                    path_name time_expression
+                                    |
+                                    path_name time_expression qualifiers
+                                    |
+                                    path_name time_expression qualifiers feature_call_parameters
+                                    |
+                                    path_name qualifiers
+                                    |
+                                    path_name qualifiers feature_call_parameters
+                                    |
+                                    path_name feature_call_parameters
+                                    |
+                                    path_name time_expression feature_call_parameters;
+    qualifiers                  ::= LSQUARE_BRACKET actual_parameter_list RSQUARE_BRACKET;
+    declarator                  ::= IDENTIFIER OR_SYMBOL
+                                    |
+                                    IDENTIFIER COLON simple_type_Specifier OR_SYMBOL
+                                    |
+                                    IDENTIFIER COMA declarator;
+    path_type_name              ::= TYPENAME
+                                    |
+                                    TYPENAME DOUBLECOLON path_type_name;
+    path_name                   ::= TYPENAME
+                                    |
+                                    IDENTIFIER
+                                    |
+                                    TYPENAME path_name
+                                    |
+                                    IDENTIFIER path_name;
+    time_expression             ::= AT IDENTIFIER;
+    actual_parameter_list       ::= expression
+                                    |
+                                    expression COMA actual_parameter_list;
+
+    logical_operator    ::= AND | OR | XOR | IMPLIES;
+    collection_kind     ::= SET | BAG | SEQUENCE | COLLECTION;
+    relational_operator ::= EQ | GR | LE | GREQ | LEQ | NEQ;
+    add_operator        ::= PLUS | MINUS;
+    multiply_operator   ::= MULTIPLICATION | DIVISION;
+    unary_operator      ::= MINUS | NOT;
+    navigation_operator ::= DOT | ARROW;
+
+
+
+
+
+

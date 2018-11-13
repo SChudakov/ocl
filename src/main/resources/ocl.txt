@@ -1,26 +1,8 @@
-context Personne
- inv : enfants->forall( e | e.age < self.age - 7)
- inv : enfants->forall( e : Personne | e.age < self.age - 7)
- inv i3 : enfants->forall( e1,e2 : Personne | e1 <> e2 implies e1.prenom <> e2.prenom)
- inv i4 : self.enfants -> isUnique ( prenom )
- def cousins : Set(Personne) = parents.parents.enfants.enfants->excluding(
-parents.enfants )->asSet()
-context Personne::age : Integer
- init : 0
-context Personne::estMarrie : Boolean
- derive : conjoint->notEmpty()
-context Personne::salaire() : integer
- post : return > 5000
-context Compagnie::embaucheEmploye( p : Personne)
- pre pasPresent : not (employes->includes(p))
- post embauche : employes->includes(p)
-context Personne::grandsParents() : Set(Personne)
- body : parents.parents->asSet()
-(age<40 implies salaire>1000) and (age>=40 implies salaire>2000)
+( age < 40 implies salaire > 1000 ) and ( age >=40 implies salaire>2000)
 if age<40 then salaire > 1000 else salaire > 2000 endif
 salaire > (if age<40 then 1000 else 2000 endif)
 nom= nom.substring(1,1).toUpper().concat(
- nom.substring(2,nom.size()).toLower())
+nom.substring(2,nom.size()).toLower())
 epouse->notEmpty() implies epouse.sexe = Sexe::Feminin
 Set { 3, 5, 2, 45, 5 }->size()
 Sequence { 1, 2, 45, 9, 3, 9 } ->count(9)

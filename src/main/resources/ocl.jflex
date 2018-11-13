@@ -33,7 +33,10 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 Comment        = "--" {InputCharacter}* {LineTerminator}?
 
 /*identifier*/
-identifier = [A-Za-z_][A-Za-z_0-9]*
+identifier = [a-z][A-Za-z_0-9]*
+
+/*typename*/
+typename = [A-Z][A-Za-z_0-9]*
 
 /*number literal*/
 integer = ([+-]?[1-9]\d*|0)
@@ -86,6 +89,9 @@ boolean = true | false
     "."                { printString(); return symbol(OCLSymbol.DOT); }
     "->"               { printString(); return symbol(OCLSymbol.ARROW); }
     "::"               { printString(); return symbol(OCLSymbol.DOUBLECOLON); }
+    "#"               { printString(); return symbol(OCLSymbol.HASHTAG); }
+    ".."                { printString(); return symbol(OCLSymbol.DOUBLEDOT); }
+    "@"                { printString(); return symbol(OCLSymbol.AT); }
 
     "@pre"             { printString(); return symbol(OCLSymbol.PRE_OPER); }
     "implies"          { printString(); return symbol(OCLSymbol.IMPLIES); }
@@ -114,6 +120,8 @@ boolean = true | false
     "oper"             { printString(); return symbol(OCLSymbol.OPER); }
 
     {identifier}       { printString(); return symbol(OCLSymbol.IDENTIFIER, yytext()); }
+
+    {typename}         { printString(); return symbol(OCLSymbol.TYPENAME, yytext()); }
 
     {integer}          { printString(); return symbol(OCLSymbol.INT, Integer.valueOf(yytext()));}
 
