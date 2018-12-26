@@ -38,14 +38,17 @@ identifier = [a-z][A-Za-z_0-9]*
 /*typename*/
 typename = [A-Z][A-Za-z_0-9]*
 
+/*name*/
+name = ([A-Z] | "_" | "$" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF])[A-Z_$a-z#xC0-#xD6#xD8-#xF6#xF8-#x2FF#x370-#x37D#x37F-#x1FFF#x200C-#x200D#x2070-#x218F#x2C00-#x2FEF#x3001-#xD7FF#xF900-#xFDCF#xFDF0-#xFFFD#x10000-#xEFFFF]*
+
 /*number literal*/
-integer = ([+-]?[1-9]\d*|0)
+integer_literal = ([+-]?[1-9]\d*|0)
 
 /*real number*/
-real = [0-9]+(\\.[0-9]+)?
+real_literal = [0-9]+(\\.[0-9]+)?
 
-/*boolean constant*/
-boolean = true | false
+/*boolean literal*/
+boolean_literal = true | false
 
 
 %state STRING_LITERAL
@@ -65,9 +68,12 @@ boolean = true | false
     "["                { printString(); return symbol(OCLSymbol.LSQUARE_BRACKET); }
     "]"                { printString(); return symbol(OCLSymbol.RSQUARE_BRACKET); }
 
+    "\'"               { printString(); return symbol(OCLSymbol.SINGLE_QUOTE); }
+    "_"                { printString(); return symbol(OCLSymbol.UNDERSCORE); }
+
     "+"                { printString(); return symbol(OCLSymbol.PLUS); }
     "-"                { printString(); return symbol(OCLSymbol.MINUS); }
-    "*"                { printString(); return symbol(OCLSymbol.MULTIPLICATION); }
+    "*"                { printString(); return symbol(OCLSymbol.STAR); }
     "/"                { printString(); return symbol(OCLSymbol.DIVISION); }
 
     ">"                { printString(); return symbol(OCLSymbol.GR); }
@@ -89,11 +95,15 @@ boolean = true | false
     "."                { printString(); return symbol(OCLSymbol.DOT); }
     "->"               { printString(); return symbol(OCLSymbol.ARROW); }
     "::"               { printString(); return symbol(OCLSymbol.DOUBLECOLON); }
-    "#"               { printString(); return symbol(OCLSymbol.HASHTAG); }
-    ".."                { printString(); return symbol(OCLSymbol.DOUBLEDOT); }
+    "#"                { printString(); return symbol(OCLSymbol.HASHTAG); }
+    ".."               { printString(); return symbol(OCLSymbol.DOUBLEDOT); }
     "@"                { printString(); return symbol(OCLSymbol.AT); }
 
-    "@pre"             { printString(); return symbol(OCLSymbol.PRE_OPER); }
+    "^"                { printString(); return symbol(OCLSymbol.CUP); }
+    "^^"               { printString(); return symbol(OCLSymbol.DOUBLE_CUP); }
+
+    "?"               { printString(); return symbol(OCLSymbol.QUESTION_SIGN); }
+
     "implies"          { printString(); return symbol(OCLSymbol.IMPLIES); }
 
 
@@ -119,15 +129,51 @@ boolean = true | false
     "in"               { printString(); return symbol(OCLSymbol.IN); }
     "oper"             { printString(); return symbol(OCLSymbol.OPER); }
 
-    {identifier}       { printString(); return symbol(OCLSymbol.IDENTIFIER, yytext()); }
+    "init"             { printString(); return symbol(OCLSymbol.INIT); }
+    "derive"             { printString(); return symbol(OCLSymbol.DERIVE); }
 
-    {typename}         { printString(); return symbol(OCLSymbol.TYPENAME, yytext()); }
+    "static"             { printString(); return symbol(OCLSymbol.STATIC); }
 
-    {integer}          { printString(); return symbol(OCLSymbol.INT, Integer.valueOf(yytext()));}
+    "true"             { printString(); return symbol(OCLSymbol.TRUE); }
+    "false"             { printString(); return symbol(OCLSymbol.FALSE); }
 
-    {real}             { printString(); return symbol(OCLSymbol.REAL, Double.valueOf(yytext()));}
 
-    {boolean}          { printString(); return symbol(OCLSymbol.BOOLEAN, Boolean.valueOf(yytext()));}
+    "Tuple"                  { printString(); return symbol(OCLSymbol.TUPLE); }
+    "Set"                    { printString(); return symbol(OCLSymbol.SET); }
+    "Bag"                    { printString(); return symbol(OCLSymbol.BAG); }
+    "Sequence"               { printString(); return symbol(OCLSymbol.SEQUENCE); }
+    "Collection"             { printString(); return symbol(OCLSymbol.COLLECTION); }
+    "OrderedSet"             { printString(); return symbol(OCLSymbol.ORDERED_SET); }
+
+
+    "OclAny"                 { printString(); return symbol(OCLSymbol.OCL_ANY); }
+    "OclInvalid"             { printString(); return symbol(OCLSymbol.OCL_INVALID); }
+    "OclMessage"             { printString(); return symbol(OCLSymbol.OCL_MESSAGE); }
+    "OclVoid"                { printString(); return symbol(OCLSymbol.OCL_VOID); }
+
+
+    "Boolean"                { printString(); return symbol(OCLSymbol.BOOLEAN); }
+    "Integer"                { printString(); return symbol(OCLSymbol.INTEGER); }
+    "Real"                   { printString(); return symbol(OCLSymbol.REAL); }
+    "String"                 { printString(); return symbol(OCLSymbol.STRING); }
+    "UnlimitedNatural"       { printString(); return symbol(OCLSymbol.UNLIMITED_NATURAL); }
+
+    "self"                   { printString(); return symbol(OCLSymbol.SELF); }
+
+    "null"                   { printString(); return symbol(OCLSymbol.NULL); }
+    "invalid"                { printString(); return symbol(OCLSymbol.INVALID); }
+
+    {identifier}             { printString(); return symbol(OCLSymbol.IDENTIFIER, yytext()); }
+
+    {typename}               { printString(); return symbol(OCLSymbol.TYPENAME, yytext()); }
+
+    {name}                   { printString(); return symbol(OCLSymbol.NAME, yytext()); }
+
+    {integer_literal}          { printString(); return symbol(OCLSymbol.INTEGER_LITERAL, Integer.valueOf(yytext()));}
+
+    {real_literal}             { printString(); return symbol(OCLSymbol.REAL_LITERAL, Double.valueOf(yytext()));}
+
+    {boolean_literal}          { printString(); return symbol(OCLSymbol.BOOLEAN_LITERAL, Boolean.valueOf(yytext()));}
 
     {Comment}          { printString();  }
 

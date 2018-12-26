@@ -22,10 +22,10 @@ public class Main {
             e.printStackTrace();
         }*/
         try {
-            OCLScanner scanner = new OCLScanner(new FileInputStream(OCL_TEST_FILE));
+            /*OCLScanner scanner = new OCLScanner(new FileInputStream(OCL_TEST_FILE));
             while (scanner.next_token().sym != 0)  {
                 System.out.println();
-            }
+            }*/
             OCLParser p = new OCLParser(new OCLScanner(new FileInputStream(OCL_TEST_FILE)), new DefaultSymbolFactory());
             p.parse();
         } catch (FileNotFoundException e) {

@@ -33,162 +33,531 @@ parser code {:
 
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
 
-terminal COMA,SEMICOLON, COLON, LPAREN, RPAREN,LCURLY_BRACE,RCURLY_BRACE,LSQUARE_BRACKET,RSQUARE_BRACKET;
-terminal PLUS, MINUS, MULTIPLICATION, DIVISION;
+terminal COMA, SEMICOLON, COLON, LPAREN, RPAREN, LCURLY_BRACE, RCURLY_BRACE, LSQUARE_BRACKET, RSQUARE_BRACKET;
+terminal SINGLE_QUOTE;
+terminal UNDERSCORE;
+terminal PLUS, MINUS, STAR, DIVISION;
 terminal GR, GREQ, LE, LEQ, EQ, NEQ, EQEQ;
 terminal AND, OR, NOT, XOR;
 terminal OR_SYMBOL;
 terminal HASHTAG, DOUBLEDOT, AT;
 terminal DOT, ARROW, DOUBLECOLON;
-terminal PRE_OPER, IMPLIES;
+terminal IMPLIES;
 terminal CONTEXT, INV,PRE,POST;
 terminal ATTR, BODY;
 terminal DEF, LET;
 terminal IF, THEN,ELSE,ENDIF;
 terminal PACKAGE, ENDPACKAGE;
 terminal IN, OPER;
-terminal SET, BAG, SEQUENCE, COLLECTION;
+terminal TUPLE,SET,BAG,SEQUENCE,COLLECTION,ORDERED_SET;
 terminal ENUM;
+terminal INIT, DERIVE;
+terminal STATIC;
+terminal OCL_ANY,OCL_INVALID,OCL_MESSAGE,OCL_VOID;
+terminal BOOLEAN,INTEGER,REAL,STRING,UNLIMITED_NATURAL;
+terminal SELF;
+terminal NULL, INVALID;
+terminal CUP, DOUBLE_CUP;
+terminal QUESTION_SIGN;
 
-terminal Integer    INT;
-terminal Double     REAL;
+terminal Integer    INTEGER_LITERAL;
+terminal Double     REAL_LITERAL;
 terminal String     STRING_LITERAL;
 terminal String     IDENTIFIER;
 terminal String     TYPENAME;
-terminal Boolean    BOOLEAN;
-
-non terminal Object     expr_list, expr_part;
-non terminal Integer    expr, factor, term;
-
-non terminal expression;
-non terminal logical_expression;
-non terminal relational_expression;
-non terminal additive_expression;
-non terminal multiplicative_expression;
-non terminal unary_expression;
-non terminal postfix_expression;
-non terminal primary_expression;
-non terminal if_expression;
-
-non terminal feature_call_parameters;
-non terminal literal;
-non terminal enumeration_type;
-non terminal simple_type_Specifier;
-non terminal literal_collection;
-non terminal expression_list_or_range;
-non terminal feature_call;
-non terminal qualifiers;
-non terminal declarator;
-non terminal path_type_name;
-non terminal path_name;
-non terminal time_expression;
-non terminal actual_parameter_list;
-non terminal enumeration_list;
-non terminal expression_list;
-
-non terminal logical_operator;
-non terminal collection_kind;
-non terminal relational_operator;
-non terminal add_operator;
-non terminal multiply_operator;
-non terminal unary_operator;
-non terminal navigation_operator;
+terminal String     NAME;
+terminal Boolean    BOOLEAN_LITERAL;
 
 
+// declarations
+non terminal packageDeclarationCS, contextDeclarationCS_list, contextDeclarationCS;
+// decl
+non terminal propertyContextDeclCS, classifierContextDeclCS, operationContextDeclCS, prePostOrBodyDeclCS;
+// or
+non terminal initOrDerValueCS, invOrDefCS;
+// expression
+non terminal defExpressionCS, OclExpressionCS, ExpressionInOclCS;
+// type
+non terminal typeCS, tupleTypeCS, oclTypeCS, primitiveTypeCS, collectionTypeCS, CollectionTypeIdentifierCS;
+// literals groups
+non terminal LiteralExpCS, EnumLiteralExpCS, CollectionLiteralExpCS, CollectionLiteralPartsCS, CollectionLiteralPartCS, TupleLiteralExpCS, PrimitiveLiteralExpCS;
+// primitives literals
+non terminal BooleanLiteralExpCS, UnlimitedNaturalLiteralExpCS, NullLiteralExpCS,InvalidLiteralExpCS, TypeLiteralExpCS, IntegerLiteralExpCS, RealLiteralExpCS, RealLiteralExpCS,StringLiteralExpCS;
+// call exp CS
+non terminal CallExpCS, FeatureCallExpCS, OperationCallExpCS, PropertyCallExpCS, NavigationCallExpCS, AssociationClassCallExpCS;
+// flow controll operators
+non terminal LetExpCS,  OclMessageExpCS, IfExpCS, LoopExpCS, IteratorExpCS, IterateExpCS, LetExpSubCS;
+// variable
+non terminal VariableDeclarationCS, variableDeclarationListCS, VariableExpCS;
+// name
+non terminal pathNameCS, unreservedSimpleNameCS, simpleNameCS;
+// othres
+non terminal operationCS;
+non terminal parametersCS;
+non terminal OclMessageArgumentsCS;
+non terminal OclMessageArgCS;
+non terminal restrictedKeywordCS;
+non terminal CollectionRangeCS;
+non terminal argumentsCS;
+non terminal isMarkedPreCS;
+
+// Level 0
+packageDeclarationCS         ::= PACKAGE pathNameCS contextDeclarationCS_list ENDPACKAGE
+                                 |
+                                 contextDeclarationCS_list;
 
 
-
-    expression                  ::= logical_expression;
-    logical_expression          ::= relational_expression
-                                    |
-                                    logical_expression logical_operator logical_expression;
-    relational_expression       ::= additive_expression relational_operator additive_expression;
-    additive_expression         ::= multiplicative_expression
-                                    |
-                                    multiplicative_expression add_operator additive_expression;
-    multiplicative_expression   ::= unary_expression
-                                    |
-                                    unary_expression multiply_operator multiplicative_expression;
-    unary_expression            ::= postfix_expression
-                                    |
-                                    unary_operator unary_expression;
-    postfix_expression          ::= primary_expression
-                                    |
-                                    postfix_expression navigation_operator feature_call;
-    primary_expression          ::= literal_collection
-                                    |
-                                    literal
-                                    |
-                                    feature_call
-                                    |
-                                    LPAREN expression RPAREN
-                                    |
-                                    if_expression;
-    if_expression               ::= IF expression THEN expression ELSE expression ENDIF;
-    feature_call_parameters     ::= LPAREN declarator actual_parameter_list RPAREN
-                                    |
-                                    LPAREN actual_parameter_list RPAREN;
-    literal                     ::= STRING_LITERAL | INT | HASHTAG IDENTIFIER;
-    enumeration_list            ::= HASHTAG IDENTIFIER
-                                    |
-                                    HASHTAG IDENTIFIER enumeration_list;
-    enumeration_type            ::= ENUM LCURLY_BRACE enumeration_list RCURLY_BRACE;
-    simple_type_Specifier       ::= path_type_name | enumeration_type;
-    literal_collection          ::= collection_kind LCURLY_BRACE RCURLY_BRACE
-                                    |
-                                    collection_kind LCURLY_BRACE expression_list_or_range RCURLY_BRACE;
-    expression_list_or_range    ::= expression DOUBLEDOT expression
-                                    |
-                                    expression_list;
-    expression_list             ::= expression
-                                    |
-                                    expression COMA expression_list;
-    feature_call                ::= path_name
-                                    |
-                                    path_name time_expression
-                                    |
-                                    path_name time_expression qualifiers
-                                    |
-                                    path_name time_expression qualifiers feature_call_parameters
-                                    |
-                                    path_name qualifiers
-                                    |
-                                    path_name qualifiers feature_call_parameters
-                                    |
-                                    path_name feature_call_parameters
-                                    |
-                                    path_name time_expression feature_call_parameters;
-    qualifiers                  ::= LSQUARE_BRACKET actual_parameter_list RSQUARE_BRACKET;
-    declarator                  ::= IDENTIFIER OR_SYMBOL
-                                    |
-                                    IDENTIFIER COLON simple_type_Specifier OR_SYMBOL
-                                    |
-                                    IDENTIFIER COMA declarator;
-    path_type_name              ::= TYPENAME
-                                    |
-                                    TYPENAME DOUBLECOLON path_type_name;
-    path_name                   ::= TYPENAME
-                                    |
-                                    IDENTIFIER
-                                    |
-                                    TYPENAME path_name
-                                    |
-                                    IDENTIFIER path_name;
-    time_expression             ::= AT IDENTIFIER;
-    actual_parameter_list       ::= expression
-                                    |
-                                    expression COMA actual_parameter_list;
-
-    logical_operator    ::= AND | OR | XOR | IMPLIES;
-    collection_kind     ::= SET | BAG | SEQUENCE | COLLECTION;
-    relational_operator ::= EQ | GR | LE | GREQ | LEQ | NEQ;
-    add_operator        ::= PLUS | MINUS;
-    multiply_operator   ::= MULTIPLICATION | DIVISION;
-    unary_operator      ::= MINUS | NOT;
-    navigation_operator ::= DOT | ARROW;
+// Level 1
+contextDeclarationCS_list    ::= contextDeclarationCS contextDeclarationCS_list
+                                 |
+                                 contextDeclarationCS
+                                 |
+                                 ;
 
 
+pathNameCS                   ::= simpleNameCS
+                                 |
+                                 pathNameCS DOUBLECOLON unreservedSimpleNameCS;
 
 
+// Level 2
+contextDeclarationCS         ::= propertyContextDeclCS
+                                 |
+                                 classifierContextDeclCS
+                                 |
+                                 operationContextDeclCS;
 
 
+simpleNameCS                 ::= NAME
+                                 |
+                                 UNDERSCORE STRING_LITERAL
+                                 |
+                                 simpleNameCS STRING_LITERAL;
+
+
+unreservedSimpleNameCS       ::= simpleNameCS
+                                 |
+                                 restrictedKeywordCS;
+
+
+// Level 3
+propertyContextDeclCS        ::= CONTEXT pathNameCS DOUBLECOLON simpleName COLON typeCS initOrDerValueCS;
+
+
+classifierContextDeclCS      ::= CONTEXT pathNameCS invOrDefCS
+                                 |
+                                 CONTEXT simpleNameCS COLON pathNameCS invOrDefCS;
+
+
+operationContextDeclCS       ::= CONTEXT operationCS prePostOrBodyDeclCS;
+
+
+restrictedKeywordCS          ::= CollectionTypeIdentifierCS
+                                 |
+                                 primitiveTypeCS
+                                 |
+                                 oclTypeCS
+                                 |
+                                 TUPLE;
+
+
+// Level 4
+initOrDerValueCS             ::= INIT COLON OclExpression
+                                 |
+                                 INIT COLON OclExpression initOrDerValueCS
+                                 |
+                                 DERIVE COLON OclExpression
+                                 |
+                                 DERIVE COLON OclExpression initOrDerValueCS;
+
+
+typeCS                       ::= pathNameCS
+                                 |
+                                 collectionTypeCS
+                                 |
+                                 tupleTypeCS
+                                 |
+                                 primitiveTypeCS
+                                 |
+                                 oclTypeCS;
+
+
+invOrDefCS                   ::= INV COLON OclExpressionCS invOrDefCS
+                                 |
+                                 INV simpleNameCS COLON OclExpressionCS invOrDefCS
+                                 |
+                                 DEF COLON defExpressionCS invOrDefCS
+                                 |
+                                 DEF simpleNameCS COLON defExpressionCS invOrDefCS
+                                 |
+                                 STATIC DEF COLON defExpressionCS invOrDefCS
+                                 |
+                                 STATIC DEF simpleNameCS COLON defExpressionCS invOrDefCS;
+
+
+operationCS                  ::= pathNameCS DOUBLE_COLON simpleNameCS LPAREN RPAREN COLON
+                                 |
+                                 pathNameCS DOUBLE_COLON simpleNameCS LPAREN RPAREN COLON typeCS
+                                 |
+                                 pathNameCS DOUBLE_COLON simpleNameCS LPAREN parametersCS RPAREN COLON
+                                 |
+                                 pathNameCS DOUBLE_COLON simpleNameCS LPAREN parametersCS RPAREN COLON typeCS
+                                 |
+                                 simpleNameCS LPAREN RPAREN COLON
+                                 |
+                                 simpleNameCS LPAREN RPAREN COLON typeCS
+                                 |
+                                 simpleNameCS LPAREN parametersCS RPAREN COLON
+                                 |
+                                 simpleNameCS LPAREN parametersCS RPAREN COLON typeCS;
+
+
+prePostOrBodyDeclCS          ::= PRE COLON OclExpressionCS
+                                 |
+                                 PRE COLON OclExpressionCS prePostOrBodyDeclCS
+                                 |
+                                 PRE simpleNameCS COLON OclExpressionCS
+                                 |
+                                 PRE simpleNameCS COLON OclExpressionCS prePostOrBodyDeclCS
+                                 |
+                                 POST COLON OclExpressionCS
+                                 |
+                                 POST COLON OclExpressionCS prePostOrBodyDeclCS
+                                 |
+                                 POST simpleNameCS COLON OclExpressionCS
+                                 |
+                                 POST simpleNameCS COLON OclExpressionCS prePostOrBodyDeclCS
+                                 |
+                                 BODY COLON OclExpressionCS
+                                 |
+                                 BODY COLON OclExpressionCS prePostOrBodyDeclCS
+                                 |
+                                 BODY simpleNameCS COLON OclExpressionCS
+                                 |
+                                 BODY simpleNameCS COLON OclExpressionCS prePostOrBodyDeclCS;
+
+
+oclTypeCS                    ::= OCL_ANY
+                                 |
+                                 OCL_INVALID
+                                 |
+                                 OCL_MESSAGE
+                                 |
+                                 OCL_VOID;
+
+
+CollectionTypeIdentifierCS   ::= SET
+                                 |
+                                 BAG
+                                 |
+                                 SEQUENCE
+                                 |
+                                 COLLECTION
+                                 |
+                                 ORDERED_SET;
+
+
+primitiveTypeCS              ::= BOOLEAN
+                                 |
+                                 INTEGER
+                                 |
+                                 REAL
+                                 |
+                                 STRING
+                                 |
+                                 UNLIMITED_NATURAL;
+
+
+// Level 5
+tupleTypeCS                  ::= TUPLE LPAREN RPAREN
+                                 |
+                                 TUPLE LPAREN variableDeclarationListCS RPAREN;
+
+
+collectionTypeCS             ::= CollectionTypeIdentifierCS LPAREN typeCS RPAREN;
+
+
+OclExpressionCS              ::= CallExpCS
+                                 |
+                                 VariableExpCS
+                                 |
+                                 LiteralExpCS
+                                 |
+                                 LetExpCS
+                                 |
+                                 OclMessageExpCS
+                                 |
+                                 IfExpCS;
+
+
+defExpressionCS              ::= VariableDeclarationCS EQ OclExpression
+                                 |
+                                 operationCS EQ OclExpression;
+
+
+parametersCS                 ::= VariableDeclarationCS
+                                 |
+                                 VariableDeclarationCS COMA parametersCS;
+
+
+// Level 6
+variableDeclarationListCS    ::= VariableDeclarationCS
+                                 |
+                                 VariableDeclarationCS COMA variableDeclarationListCS;
+
+
+OclMessageExpCS              ::= OclExpressionCS DOUBLE_CUP simpleNameCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS DOUBLE_CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN
+                                 |
+                                 OclExpressionCS CUP simpleNameCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN;
+
+
+IfExpCS                      ::= IF OclExpression THEN OclExpression ELSE OclExpression ENDIF;
+
+
+LetExpCS                     ::= LET VariableDeclarationCS LetExpSubCS;
+
+
+VariableExpCS                ::= simpleNameCS
+                                 |
+                                 SELF;
+
+
+CallExpCS                    ::= FeatureCallExpCS
+                                 |
+                                 LoopExpCS;
+
+
+LiteralExpCS                 ::= EnumLiteralExpCS
+                                 |
+                                 CollectionLiteralExpCS
+                                 |
+                                 TupleLiteralExpCS
+                                 |
+                                 PrimitiveLiteralExpCS
+                                 |
+                                 TypeLiteralExpCS;
+
+
+VariableDeclarationCS        ::= simpleNameCS
+                                 |
+                                 simpleNameCS EQ OclExpressionCS
+                                 |
+                                 simpleNameCS COLON typeCS EQ OclExpressionCS
+                                 |
+                                 simpleNameCS COLON typeCS EQ OclExpressionCS;
+
+
+// Level 7
+OclMessageArgumentsCS        ::= OclMessageArgCS
+                                 |
+                                 OclMessageArgCS COMA OclMessageArgumentsCS;
+
+
+LetExpSubCS                  ::= COMA VariableDeclarationCS LetExpSubCS
+                                 |
+                                 IN OclExpressionCS;
+
+
+LoopExpCS                    ::= IteratorExpCS
+                                 |
+                                 IterateExpCS;
+
+
+FeatureCallExpCS             ::= OperationCallExpCS
+                                 |
+                                 PropertyCallExpCS
+                                 |
+                                 NavigationCallExpCS;
+
+
+EnumLiteralExpCS             ::= pathNameCS DOUBLECOLON simpleNameCS;
+
+
+CollectionLiteralExpCS       ::= CollectionTypeIdentifierCS LCURLY_BRACE RCURLY_BRACE
+                                 |
+                                 CollectionTypeIdentifierCS LCURLY_BRACE CollectionLiteralPartsCS RCURLY_BRACE;
+
+
+PrimitiveLiteralExpCS        ::= IntegerLiteralExpCS
+                                 |
+                                 RealLiteralExpCS
+                                 |
+                                 StringLiteralExpCS
+                                 |
+                                 BooleanLiteralExpCS
+                                 |
+                                 UnlimitedNaturalLiteralExpCS
+                                 |
+                                 NullLiteralExpCS
+                                 |
+                                 InvalidLiteralExpCS;
+
+
+TupleLiteralExpCS            ::= TUPLE LCURLY_BRACE variableDeclarationListCS RCURLY_BRACE;
+
+
+TypeLiteralExpCS             ::= typeCS;
+
+
+// Level 8
+OclMessageArgCS              ::= QUESTION_SIGN
+                                 |
+                                 QUESTION_SIGN COLON typeCS
+                                 |
+                                 OclExpressionCS;
+
+
+IteratorExpCS                ::= OclExpressionCS ARROW simpleNameCS LPAREN OclExpressionCS RPAREN
+                                 |
+                                 OclExpressionCS ARROW simpleNameCS LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
+                                 |
+                                 OclExpressionCS ARROW simpleNameCS LPAREN VariableDeclarationCS COMA VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
+                                 |
+                                 OclExpressionCS DOT LPAREN simpleNameCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS DOT LPAREN simpleNameCS LPAREN argumentsCS RPAREN
+                                 |
+                                 OclExpressionCS DOT simpleNameCS
+                                 |
+                                 OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET;
+
+
+IterateExpCS                 ::= OclExpressionCS ARROW ITERATE LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
+                                 |
+                                 OclExpressionCS ARROW ITERATE LPAREN VariableDeclarationCS SEMICOLON VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN;
+
+
+OperationCallExpCS           ::= OclExpressionCS simpleNameCS OclExpressionCS
+                                 |
+                                 OclExpressionCS ARROW simpleNameCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS ARROW simpleNameCS LPAREN argumentsCS RPAREN
+                                 |
+                                 OclExpressionCS DOT simpleNameCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS DOT simpleNameCS LPAREN argumentsCS RPAREN
+                                 |
+                                 simpleNameCS LPAREN RPAREN
+                                 |
+                                 simpleNameCS LPAREN argumentsCS RPAREN
+                                 |
+                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN
+                                 |
+                                 simpleNameCS isMarkedPreCS LPAREN RPAREN
+                                 |
+                                 simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN
+                                 |
+                                 pathNameCS LPAREN RPAREN
+                                 |
+                                 pathNameCS LPAREN argumentsCS RPAREN
+                                 |
+                                 simpleNameCS OclExpressionCS
+                                 |
+                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS LPAREN argumentsCS RPAREN
+                                 |
+                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS isMarkedPreCS LPAREN RPAREN
+                                 |
+                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN;
+
+
+NavigationCallExpCS          ::= PropertyCallExpCS
+                                 |
+                                 AssociationClassCallExpCS;
+
+
+PropertyCallExpCS            ::= OclExpressionCS DOT simpleNameCS
+                                 |
+                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS
+                                 |
+                                 simpleNameCS
+                                 |
+                                 simpleNameCS isMarkedPreCS
+                                 |
+                                 pathNameCS
+                                 |
+                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS
+                                 |
+                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS isMarkedPreCS;
+
+
+CollectionLiteralPartsCS     ::= CollectionLiteralPartCS
+                                 |
+                                 CollectionLiteralPartCS COMA CollectionLiteralPartsCS;
+
+
+InvalidLiteralExpCS          ::= INVALID;
+
+
+BooleanLiteralExpCS          ::= BOOLEAN_LITERAL;
+
+
+RealLiteralExpCS             ::= REAL_LITERAL;
+
+
+NullLiteralExpCS             ::= NULL;
+
+
+IntegerLiteralExpCS          ::= INTEGER_LITERAL;
+
+
+UnlimitedNaturalLiteralExpCS ::= IntegerLiteralExpCS
+                                 |
+                                 STAR;
+
+
+StringLiteralExpCS           ::= STRING_LITERAL
+                                 |
+                                 StringLiteralExpCS STRING_LITERAL;
+
+
+// Level 9
+argumentsCS                  ::= OclExpressionCS
+                                 |
+                                 OclExpressionCS COMA argumentsCS;
+
+
+isMarkedPreCS                ::= AT PRE;
+
+
+AssociationClassCallExpCS    ::= OclExpressionCS DOT simpleNameCS
+                                 |
+                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS
+                                 |
+                                 OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
+                                 |
+                                 OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS
+                                 |
+                                 simpleNameCS
+                                 |
+                                 simpleNameCS isMarkedPreCS
+                                 |
+                                 simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
+                                 |
+                                 simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS;
+
+
+CollectionLiteralPartCS      ::= CollectionRangeCS
+                                 |
+                                 OclExpressionCS;
+
+
+// Level 10
+CollectionRangeCS            ::= OclExpressionCS DOUBLEDOT OclExpressionCS;
+
+
+// Unreachable:
+ExpressionInOclCS            ::= OclExpressionCS;
+
+
+// Undefined:
+// simpleName, OclExpression
+// IteratorExpCS[3] !!! Variable Declaration && the same rules at the end
+// removed whitespace chars from StringLiteralExpCS & simpleNameCS
