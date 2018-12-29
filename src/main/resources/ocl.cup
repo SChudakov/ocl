@@ -59,6 +59,9 @@ terminal SELF;
 terminal NULL, INVALID;
 terminal CUP, DOUBLE_CUP;
 terminal QUESTION_SIGN;
+terminal ITERATE;
+terminal DIV;
+terminal MOD;
 
 terminal Integer    INTEGER_LITERAL;
 terminal Double     REAL_LITERAL;
@@ -100,6 +103,7 @@ non terminal restrictedKeywordCS;
 non terminal CollectionRangeCS;
 non terminal argumentsCS;
 non terminal isMarkedPreCS;
+
 
 // Level 0
 packageDeclarationCS         ::= PACKAGE pathNameCS contextDeclarationCS_list ENDPACKAGE
@@ -556,8 +560,90 @@ CollectionRangeCS            ::= OclExpressionCS DOUBLEDOT OclExpressionCS;
 // Unreachable:
 ExpressionInOclCS            ::= OclExpressionCS;
 
+oclExpression ::=   LiteralExpCS
+	                |
+	                LPAREN oclExpression RPAREN
+	                |
+	                pathNameCS
+	                |
+	                pathNameCS AT PRE
+	                |
+	                oclExpression LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
+	                |
+	                oclExpression LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET AT PRE
+	                |
+	                oclExpression DOT simpleName
+	                |
+	                oclExpression DOT simpleName AT PRE
+	                |
+	                oclExpression ARROW simpleName
+	                |
+	                oclExpression LPAREN RPAREN
+	                |
+	                oclExpression LPAREN oclExpression RPAREN
+	                |
+	                oclExpression LPAREN oclExpression COMA argumentsCS RPAREN
+	                |
+	                oclExpression LPAREN variableDeclarationCS OR_SYMBOL oclExpression RPAREN
+	                |
+	                oclExpression LPAREN oclExpression COMA variableDeclarationCS OR_SYMBOL oclExpression RPAREN
+	                |
+	                oclExpression LPAREN oclExpression COLON typeCS COMA variableDeclarationCS OR_SYMBOL oclExpression RPAREN
+	                |
+	                oclExpression ARROW ITERATE LPAREN variableDeclarationCS OR_SYMBOL oclExpression RPAREN
+	                |
+	                oclExpression ARROW ITERATE LPAREN variableDeclarationCS SEMICOLON variableDeclarationCS OR_SYMBOL oclExpression RPAREN
+	                |
+	                NOT oclExpression
+	                |
+	                MINUS oclExpression
+	                |
+	                oclExpression STAR oclExpression
+	                |
+	                oclExpression DIVISION oclExpression
+	                |
+	                oclExpression DIV oclExpression
+	                |
+	                oclExpression MOD oclExpression
+	                |
+	                oclExpression PLUS oclExpression
+	                |
+	                oclExpression MINUS oclExpression
+	                |
+	                oclExpression LE oclExpression
+	                |
+	                oclExpression GR oclExpression
+	                |
+	                oclExpression LEQ oclExpression
+	                |
+	                oclExpression GREQ oclExpression
+	                |
+	                oclExpression EQ oclExpression
+	                |
+	                oclExpression NEQ oclExpression
+	                |
+	                oclExpression AND oclExpression
+	                |
+	                oclExpression OR oclExpression
+	                |
+	                oclExpression XOR oclExpression
+	                |
+	                oclExpression IMPLIES oclExpression
+	                |
+	                oclExpression DOUBLE_CUP simpleName LPAREN RPAREN
+	                |
+	                oclExpression DOUBLE_CUP simpleName LPAREN oclMessageArgumentList RPAREN
+	                |
+	                oclExpression CUP simpleName LPAREN RPAREN
+	                |
+	                oclExpression CUP simpleName LPAREN oclMessageArgumentList RPAREN;
+simpleName ::=  NAME;
+
+
+
 
 // Undefined:
 // simpleName, OclExpression
+// removed let and if cases for oclExpression definition
 // IteratorExpCS[3] !!! Variable Declaration && the same rules at the end
 // removed whitespace chars from StringLiteralExpCS & simpleNameCS

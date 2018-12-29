@@ -106,6 +106,10 @@ boolean_literal = true | false
 
     "implies"          { printString(); return symbol(OCLSymbol.IMPLIES); }
 
+    "iterate"          { printString(); return symbol(OCLSymbol.ITERATE); }
+    "mod"          { printString(); return symbol(OCLSymbol.MOD); }
+    "div"          { printString(); return symbol(OCLSymbol.DIV); }
+
 
     "context"          { printString(); return symbol(OCLSymbol.CONTEXT); }
     "inv"              { printString(); return symbol(OCLSymbol.INV); }

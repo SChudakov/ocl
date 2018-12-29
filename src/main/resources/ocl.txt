@@ -11,7 +11,7 @@ context Personne::age : Integer
 context Personne::estMarrie : Boolean
  derive : conjoint->notEmpty()
 
-context Personne::salaire() : integer
+context Personne::salaire() : Integer
  post : return > 5000
 
 context Compagnie::embaucheEmploye( p : Personne)
