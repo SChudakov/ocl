@@ -34,23 +34,21 @@ parser code {:
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
 
 terminal COMA, SEMICOLON, COLON, LPAREN, RPAREN, LCURLY_BRACE, RCURLY_BRACE, LSQUARE_BRACKET, RSQUARE_BRACKET;
-terminal SINGLE_QUOTE;
 terminal UNDERSCORE;
 terminal PLUS, MINUS, STAR, DIVISION;
-terminal GR, GREQ, LE, LEQ, EQ, NEQ, EQEQ;
+terminal GR, GREQ, LE, LEQ, EQ, NEQ;
 terminal AND, OR, NOT, XOR;
 terminal OR_SYMBOL;
-terminal HASHTAG, DOUBLEDOT, AT;
+terminal DOUBLEDOT, AT;
 terminal DOT, ARROW, DOUBLECOLON;
 terminal IMPLIES;
 terminal CONTEXT, INV,PRE,POST;
-terminal ATTR, BODY;
+terminal BODY;
 terminal DEF, LET;
 terminal IF, THEN,ELSE,ENDIF;
 terminal PACKAGE, ENDPACKAGE;
-terminal IN, OPER;
+terminal IN;
 terminal TUPLE,SET,BAG,SEQUENCE,COLLECTION,ORDERED_SET;
-terminal ENUM;
 terminal INIT, DERIVE;
 terminal STATIC;
 terminal OCL_ANY,OCL_INVALID,OCL_MESSAGE,OCL_VOID;
@@ -66,8 +64,6 @@ terminal MOD;
 terminal Integer    INTEGER_LITERAL;
 terminal Double     REAL_LITERAL;
 terminal String     STRING_LITERAL;
-terminal String     IDENTIFIER;
-terminal String     TYPENAME;
 terminal String     NAME;
 terminal Boolean    BOOLEAN_LITERAL;
 
@@ -85,7 +81,7 @@ non terminal typeCS, tupleTypeCS, oclTypeCS, primitiveTypeCS, collectionTypeCS, 
 // literals groups
 non terminal LiteralExpCS, EnumLiteralExpCS, CollectionLiteralExpCS, CollectionLiteralPartsCS, CollectionLiteralPartCS, TupleLiteralExpCS, PrimitiveLiteralExpCS;
 // primitives literals
-non terminal BooleanLiteralExpCS, UnlimitedNaturalLiteralExpCS, NullLiteralExpCS,InvalidLiteralExpCS, TypeLiteralExpCS, IntegerLiteralExpCS, RealLiteralExpCS, RealLiteralExpCS,StringLiteralExpCS;
+non terminal BooleanLiteralExpCS, UnlimitedNaturalLiteralExpCS, NullLiteralExpCS,InvalidLiteralExpCS, TypeLiteralExpCS, IntegerLiteralExpCS, RealLiteralExpCS, StringLiteralExpCS;
 // call exp CS
 non terminal CallExpCS, FeatureCallExpCS, OperationCallExpCS, PropertyCallExpCS, NavigationCallExpCS, AssociationClassCallExpCS;
 // flow controll operators
@@ -95,6 +91,7 @@ non terminal VariableDeclarationCS, variableDeclarationListCS, VariableExpCS;
 // name
 non terminal pathNameCS, unreservedSimpleNameCS, simpleNameCS;
 // othres
+non terminal simpleName;
 non terminal operationCS;
 non terminal parametersCS;
 non terminal OclMessageArgumentsCS;
@@ -103,6 +100,8 @@ non terminal restrictedKeywordCS;
 non terminal CollectionRangeCS;
 non terminal argumentsCS;
 non terminal isMarkedPreCS;
+
+start with packageDeclarationCS;
 
 
 // Level 0
@@ -166,13 +165,13 @@ restrictedKeywordCS          ::= CollectionTypeIdentifierCS
 
 
 // Level 4
-initOrDerValueCS             ::= INIT COLON OclExpression
+initOrDerValueCS             ::= INIT COLON OclExpressionCS
                                  |
-                                 INIT COLON OclExpression initOrDerValueCS
+                                 INIT COLON OclExpressionCS initOrDerValueCS
                                  |
-                                 DERIVE COLON OclExpression
+                                 DERIVE COLON OclExpressionCS
                                  |
-                                 DERIVE COLON OclExpression initOrDerValueCS;
+                                 DERIVE COLON OclExpressionCS initOrDerValueCS;
 
 
 typeCS                       ::= pathNameCS
@@ -199,13 +198,13 @@ invOrDefCS                   ::= INV COLON OclExpressionCS invOrDefCS
                                  STATIC DEF simpleNameCS COLON defExpressionCS invOrDefCS;
 
 
-operationCS                  ::= pathNameCS DOUBLE_COLON simpleNameCS LPAREN RPAREN COLON
+operationCS                  ::= pathNameCS DOUBLECOLON simpleNameCS LPAREN RPAREN COLON
                                  |
-                                 pathNameCS DOUBLE_COLON simpleNameCS LPAREN RPAREN COLON typeCS
+                                 pathNameCS DOUBLECOLON simpleNameCS LPAREN RPAREN COLON typeCS
                                  |
-                                 pathNameCS DOUBLE_COLON simpleNameCS LPAREN parametersCS RPAREN COLON
+                                 pathNameCS DOUBLECOLON simpleNameCS LPAREN parametersCS RPAREN COLON
                                  |
-                                 pathNameCS DOUBLE_COLON simpleNameCS LPAREN parametersCS RPAREN COLON typeCS
+                                 pathNameCS DOUBLECOLON simpleNameCS LPAREN parametersCS RPAREN COLON typeCS
                                  |
                                  simpleNameCS LPAREN RPAREN COLON
                                  |
@@ -291,12 +290,46 @@ OclExpressionCS              ::= CallExpCS
                                  |
                                  OclMessageExpCS
                                  |
-                                 IfExpCS;
-
-
-defExpressionCS              ::= VariableDeclarationCS EQ OclExpression
+                                 IfExpCS NOT OclExpressionCS
                                  |
-                                 operationCS EQ OclExpression;
+                                 MINUS OclExpressionCS
+                                 |
+                                 OclExpressionCS STAR OclExpressionCS
+                                 |
+                                 OclExpressionCS DIVISION OclExpressionCS
+                                 |
+                                 OclExpressionCS DIV OclExpressionCS
+                                 |
+                                 OclExpressionCS MOD OclExpressionCS
+                                 |
+                                 OclExpressionCS PLUS OclExpressionCS
+                                 |
+                                 OclExpressionCS MINUS OclExpressionCS
+                                 |
+                                 OclExpressionCS LE OclExpressionCS
+                                 |
+                                 OclExpressionCS GR OclExpressionCS
+                                 |
+                                 OclExpressionCS LEQ OclExpressionCS
+                                 |
+                                 OclExpressionCS GREQ OclExpressionCS
+                                 |
+                                 OclExpressionCS EQ OclExpressionCS
+                                 |
+                                 OclExpressionCS NEQ OclExpressionCS
+                                 |
+                                 OclExpressionCS AND OclExpressionCS
+                                 |
+                                 OclExpressionCS OR OclExpressionCS
+                                 |
+                                 OclExpressionCS XOR OclExpressionCS
+                                 |
+                                 OclExpressionCS IMPLIES OclExpressionCS;
+
+
+defExpressionCS              ::= VariableDeclarationCS EQ OclExpressionCS
+                                 |
+                                 operationCS EQ OclExpressionCS;
 
 
 parametersCS                 ::= VariableDeclarationCS
@@ -319,7 +352,7 @@ OclMessageExpCS              ::= OclExpressionCS DOUBLE_CUP simpleNameCS LPAREN 
                                  OclExpressionCS CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN;
 
 
-IfExpCS                      ::= IF OclExpression THEN OclExpression ELSE OclExpression ENDIF;
+IfExpCS                      ::= IF OclExpressionCS THEN OclExpressionCS ELSE OclExpressionCS ENDIF;
 
 
 LetExpCS                     ::= LET VariableDeclarationCS LetExpSubCS;
@@ -556,94 +589,6 @@ CollectionLiteralPartCS      ::= CollectionRangeCS
 // Level 10
 CollectionRangeCS            ::= OclExpressionCS DOUBLEDOT OclExpressionCS;
 
-
-// Unreachable:
 ExpressionInOclCS            ::= OclExpressionCS;
 
-oclExpression ::=   LiteralExpCS
-	                |
-	                LPAREN oclExpression RPAREN
-	                |
-	                pathNameCS
-	                |
-	                pathNameCS AT PRE
-	                |
-	                oclExpression LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
-	                |
-	                oclExpression LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET AT PRE
-	                |
-	                oclExpression DOT simpleName
-	                |
-	                oclExpression DOT simpleName AT PRE
-	                |
-	                oclExpression ARROW simpleName
-	                |
-	                oclExpression LPAREN RPAREN
-	                |
-	                oclExpression LPAREN oclExpression RPAREN
-	                |
-	                oclExpression LPAREN oclExpression COMA argumentsCS RPAREN
-	                |
-	                oclExpression LPAREN variableDeclarationCS OR_SYMBOL oclExpression RPAREN
-	                |
-	                oclExpression LPAREN oclExpression COMA variableDeclarationCS OR_SYMBOL oclExpression RPAREN
-	                |
-	                oclExpression LPAREN oclExpression COLON typeCS COMA variableDeclarationCS OR_SYMBOL oclExpression RPAREN
-	                |
-	                oclExpression ARROW ITERATE LPAREN variableDeclarationCS OR_SYMBOL oclExpression RPAREN
-	                |
-	                oclExpression ARROW ITERATE LPAREN variableDeclarationCS SEMICOLON variableDeclarationCS OR_SYMBOL oclExpression RPAREN
-	                |
-	                NOT oclExpression
-	                |
-	                MINUS oclExpression
-	                |
-	                oclExpression STAR oclExpression
-	                |
-	                oclExpression DIVISION oclExpression
-	                |
-	                oclExpression DIV oclExpression
-	                |
-	                oclExpression MOD oclExpression
-	                |
-	                oclExpression PLUS oclExpression
-	                |
-	                oclExpression MINUS oclExpression
-	                |
-	                oclExpression LE oclExpression
-	                |
-	                oclExpression GR oclExpression
-	                |
-	                oclExpression LEQ oclExpression
-	                |
-	                oclExpression GREQ oclExpression
-	                |
-	                oclExpression EQ oclExpression
-	                |
-	                oclExpression NEQ oclExpression
-	                |
-	                oclExpression AND oclExpression
-	                |
-	                oclExpression OR oclExpression
-	                |
-	                oclExpression XOR oclExpression
-	                |
-	                oclExpression IMPLIES oclExpression
-	                |
-	                oclExpression DOUBLE_CUP simpleName LPAREN RPAREN
-	                |
-	                oclExpression DOUBLE_CUP simpleName LPAREN oclMessageArgumentList RPAREN
-	                |
-	                oclExpression CUP simpleName LPAREN RPAREN
-	                |
-	                oclExpression CUP simpleName LPAREN oclMessageArgumentList RPAREN;
 simpleName ::=  NAME;
-
-
-
-
-// Undefined:
-// simpleName, OclExpression
-// removed let and if cases for oclExpression definition
-// IteratorExpCS[3] !!! Variable Declaration && the same rules at the end
-// removed whitespace chars from StringLiteralExpCS & simpleNameCS

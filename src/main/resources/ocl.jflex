@@ -39,7 +39,7 @@ identifier = [a-z][A-Za-z_0-9]*
 typename = [A-Z][A-Za-z_0-9]*
 
 /*name*/
-name = ([A-Z] | "_" | "$" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF])[A-Z_$a-z#xC0-#xD6#xD8-#xF6#xF8-#x2FF#x370-#x37D#x37F-#x1FFF#x200C-#x200D#x2070-#x218F#x2C00-#x2FEF#x3001-#xD7FF#xF900-#xFDCF#xFDF0-#xFFFD#x10000-#xEFFFF]*
+name = [a-zA-Z ][a-zA-Z0-9 ]*
 
 /*number literal*/
 integer_literal = ([+-]?[1-9]\d*|0)
@@ -107,8 +107,8 @@ boolean_literal = true | false
     "implies"          { printString(); return symbol(OCLSymbol.IMPLIES); }
 
     "iterate"          { printString(); return symbol(OCLSymbol.ITERATE); }
-    "mod"          { printString(); return symbol(OCLSymbol.MOD); }
-    "div"          { printString(); return symbol(OCLSymbol.DIV); }
+    "mod"              { printString(); return symbol(OCLSymbol.MOD); }
+    "div"              { printString(); return symbol(OCLSymbol.DIV); }
 
 
     "context"          { printString(); return symbol(OCLSymbol.CONTEXT); }
