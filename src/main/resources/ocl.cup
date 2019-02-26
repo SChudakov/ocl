@@ -60,22 +60,26 @@ terminal QUESTION_SIGN;
 terminal ITERATE;
 terminal DIV;
 terminal MOD;
+terminal TRUE, FALSE;
+terminal IDENTIFIER;
+terminal FORALL, EXISTS;
 
 terminal Integer    INTEGER_LITERAL;
 terminal Double     REAL_LITERAL;
 terminal String     STRING_LITERAL;
-terminal String     NAME;
 terminal Boolean    BOOLEAN_LITERAL;
 
 
 // declarations
 non terminal packageDeclarationCS, contextDeclarationCS_list, contextDeclarationCS;
 // decl
-non terminal propertyContextDeclCS, classifierContextDeclCS, operationContextDeclCS, prePostOrBodyDeclCS;
+non terminal propertyContextDeclCS, classifierContextDeclCS, operationContextDeclCS, prePostOrBodyDeclCS, prePostOrBodyDeclCSList;
 // or
-non terminal initOrDerValueCS, invOrDefCS;
+non terminal initOrDerValueCS, invOrDefCS, invOrDefCSList;
 // expression
 non terminal defExpressionCS, OclExpressionCS, ExpressionInOclCS;
+non terminal LeafOclExpressionCS, MultiplyOclExpressionCS, AddOclExpressionCS;
+non terminal LeafLogicalOclExpressionCS, AndLogicalOclExpressionCS, OrLogicalOclExpressionCS, XorLogicalOclExpressionCS, ImpliesLogicalOclExpressionCS;
 // type
 non terminal typeCS, tupleTypeCS, oclTypeCS, primitiveTypeCS, collectionTypeCS, CollectionTypeIdentifierCS;
 // literals groups
@@ -91,7 +95,6 @@ non terminal VariableDeclarationCS, variableDeclarationListCS, VariableExpCS;
 // name
 non terminal pathNameCS, unreservedSimpleNameCS, simpleNameCS;
 // othres
-non terminal simpleName;
 non terminal operationCS;
 non terminal parametersCS;
 non terminal OclMessageArgumentsCS;
@@ -102,10 +105,13 @@ non terminal argumentsCS;
 non terminal isMarkedPreCS;
 
 start with packageDeclarationCS;
+//start with LeafOclExpressionCS;
 
 
 // Level 0
 packageDeclarationCS         ::= PACKAGE pathNameCS contextDeclarationCS_list ENDPACKAGE
+                                 |
+                                 PACKAGE pathNameCS ENDPACKAGE
                                  |
                                  contextDeclarationCS_list;
 
@@ -114,7 +120,6 @@ packageDeclarationCS         ::= PACKAGE pathNameCS contextDeclarationCS_list EN
 contextDeclarationCS_list    ::= contextDeclarationCS contextDeclarationCS_list
                                  |
                                  contextDeclarationCS
-                                 |
                                  ;
 
 
@@ -131,7 +136,7 @@ contextDeclarationCS         ::= propertyContextDeclCS
                                  operationContextDeclCS;
 
 
-simpleNameCS                 ::= NAME
+simpleNameCS                 ::= IDENTIFIER // cahnged: NAME is IDENTIFIER
                                  |
                                  UNDERSCORE STRING_LITERAL
                                  |
@@ -144,15 +149,20 @@ unreservedSimpleNameCS       ::= simpleNameCS
 
 
 // Level 3
-propertyContextDeclCS        ::= CONTEXT pathNameCS DOUBLECOLON simpleName COLON typeCS initOrDerValueCS;
+// cahnged: simpleName to simpleNameCS
+propertyContextDeclCS        ::= CONTEXT pathNameCS DOUBLECOLON simpleNameCS COLON typeCS initOrDerValueCS;
 
-
-classifierContextDeclCS      ::= CONTEXT pathNameCS invOrDefCS
+//changed: added
+invOrDefCSList               ::= invOrDefCS
                                  |
-                                 CONTEXT simpleNameCS COLON pathNameCS invOrDefCS;
+                                 invOrDefCSList invOrDefCS;
+
+classifierContextDeclCS      ::= CONTEXT pathNameCS invOrDefCSList
+                                 |
+                                 CONTEXT simpleNameCS COLON pathNameCS invOrDefCSList;
 
 
-operationContextDeclCS       ::= CONTEXT operationCS prePostOrBodyDeclCS;
+operationContextDeclCS       ::= CONTEXT operationCS prePostOrBodyDeclCSList;
 
 
 restrictedKeywordCS          ::= CollectionTypeIdentifierCS
@@ -184,18 +194,19 @@ typeCS                       ::= pathNameCS
                                  |
                                  oclTypeCS;
 
-
-invOrDefCS                   ::= INV COLON OclExpressionCS invOrDefCS
+// cahnged: invOrDefCSList added
+invOrDefCS                   ::= INV COLON OclExpressionCS
                                  |
-                                 INV simpleNameCS COLON OclExpressionCS invOrDefCS
+                                 INV simpleNameCS COLON OclExpressionCS
                                  |
-                                 DEF COLON defExpressionCS invOrDefCS
+                                 DEF COLON defExpressionCS
                                  |
-                                 DEF simpleNameCS COLON defExpressionCS invOrDefCS
+                                 DEF simpleNameCS COLON defExpressionCS
                                  |
-                                 STATIC DEF COLON defExpressionCS invOrDefCS
+                                 STATIC DEF COLON defExpressionCS
                                  |
-                                 STATIC DEF simpleNameCS COLON defExpressionCS invOrDefCS;
+                                 STATIC DEF simpleNameCS COLON defExpressionCS
+                                 ;
 
 
 operationCS                  ::= pathNameCS DOUBLECOLON simpleNameCS LPAREN RPAREN COLON
@@ -206,38 +217,31 @@ operationCS                  ::= pathNameCS DOUBLECOLON simpleNameCS LPAREN RPAR
                                  |
                                  pathNameCS DOUBLECOLON simpleNameCS LPAREN parametersCS RPAREN COLON typeCS
                                  |
-                                 simpleNameCS LPAREN RPAREN COLON
+                                 simpleNameCS LPAREN RPAREN // changed: extra COLON
                                  |
                                  simpleNameCS LPAREN RPAREN COLON typeCS
                                  |
-                                 simpleNameCS LPAREN parametersCS RPAREN COLON
+                                 simpleNameCS LPAREN parametersCS RPAREN // changed: extra COLON
                                  |
                                  simpleNameCS LPAREN parametersCS RPAREN COLON typeCS;
 
+prePostOrBodyDeclCSList      ::= prePostOrBodyDeclCS prePostOrBodyDeclCSList
+                                 |
+                                 prePostOrBodyDeclCS
+                                 ;
 
 prePostOrBodyDeclCS          ::= PRE COLON OclExpressionCS
                                  |
-                                 PRE COLON OclExpressionCS prePostOrBodyDeclCS
-                                 |
                                  PRE simpleNameCS COLON OclExpressionCS
-                                 |
-                                 PRE simpleNameCS COLON OclExpressionCS prePostOrBodyDeclCS
                                  |
                                  POST COLON OclExpressionCS
                                  |
-                                 POST COLON OclExpressionCS prePostOrBodyDeclCS
-                                 |
                                  POST simpleNameCS COLON OclExpressionCS
-                                 |
-                                 POST simpleNameCS COLON OclExpressionCS prePostOrBodyDeclCS
                                  |
                                  BODY COLON OclExpressionCS
                                  |
-                                 BODY COLON OclExpressionCS prePostOrBodyDeclCS
-                                 |
                                  BODY simpleNameCS COLON OclExpressionCS
-                                 |
-                                 BODY simpleNameCS COLON OclExpressionCS prePostOrBodyDeclCS;
+                                 ;
 
 
 oclTypeCS                    ::= OCL_ANY
@@ -280,17 +284,84 @@ tupleTypeCS                  ::= TUPLE LPAREN RPAREN
 collectionTypeCS             ::= CollectionTypeIdentifierCS LPAREN typeCS RPAREN;
 
 
-OclExpressionCS              ::= CallExpCS
-                                 |
-                                 VariableExpCS
+// changed: added
+LeafOclExpressionCS          ::= VariableExpCS
                                  |
                                  LiteralExpCS
+                                 |
+                                 CallExpCS
+                                 |
+                                 LPAREN OclExpressionCS RPAREN
+                                 ;
+
+// changed: added
+MultiplyOclExpressionCS     ::=  LeafOclExpressionCS
+                                 |
+                                 MultiplyOclExpressionCS STAR LeafOclExpressionCS
+                                 |
+                                 MultiplyOclExpressionCS DIVISION LeafOclExpressionCS
+                                 |
+                                 MultiplyOclExpressionCS DIV LeafOclExpressionCS
+                                 |
+                                 MultiplyOclExpressionCS MOD LeafOclExpressionCS
+                                 ;
+
+// changed: added
+AddOclExpressionCS           ::= MultiplyOclExpressionCS
+                                 |
+                                 AddOclExpressionCS PLUS MultiplyOclExpressionCS
+                                 |
+                                 AddOclExpressionCS MINUS MultiplyOclExpressionCS
+                                 |
+                                 MINUS MultiplyOclExpressionCS
+                                 ;
+
+LeafLogicalOclExpressionCS  ::=  AddOclExpressionCS LE AddOclExpressionCS
+                                 |
+                                 AddOclExpressionCS GR AddOclExpressionCS
+                                 |
+                                 AddOclExpressionCS LEQ AddOclExpressionCS
+                                 |
+                                 AddOclExpressionCS GREQ AddOclExpressionCS
+                                 |
+                                 AddOclExpressionCS NEQ AddOclExpressionCS
+                                 |
+                                 AddOclExpressionCS EQ AddOclExpressionCS
+                                 |
+                                 AddOclExpressionCS
+                                 ;
+
+AndLogicalOclExpressionCS    ::= LeafLogicalOclExpressionCS AND LeafLogicalOclExpressionCS
+                                 |
+                                 LeafLogicalOclExpressionCS
+                                 ;
+
+OrLogicalOclExpressionCS     ::= AndLogicalOclExpressionCS OR AndLogicalOclExpressionCS
+                                 |
+                                 AndLogicalOclExpressionCS
+                                 ;
+
+XorLogicalOclExpressionCS    ::= OrLogicalOclExpressionCS XOR OrLogicalOclExpressionCS
+                                 |
+                                 OrLogicalOclExpressionCS
+                                 ;
+
+ImpliesLogicalOclExpressionCS::= XorLogicalOclExpressionCS IMPLIES XorLogicalOclExpressionCS
+                                 |
+                                 XorLogicalOclExpressionCS
+                                 ;
+
+// changed: a lot
+OclExpressionCS              ::= ImpliesLogicalOclExpressionCS //LeafOclExpressionCS
                                  |
                                  LetExpCS
                                  |
                                  OclMessageExpCS
                                  |
-                                 IfExpCS NOT OclExpressionCS
+                                 IfExpCS
+                                 /*
+                                 |
+                                 NOT OclExpressionCS
                                  |
                                  MINUS OclExpressionCS
                                  |
@@ -324,10 +395,12 @@ OclExpressionCS              ::= CallExpCS
                                  |
                                  OclExpressionCS XOR OclExpressionCS
                                  |
-                                 OclExpressionCS IMPLIES OclExpressionCS;
+                                 OclExpressionCS IMPLIES OclExpressionCS*/;
 
-
-defExpressionCS              ::= VariableDeclarationCS EQ OclExpressionCS
+// changed: conflict with VariableDeclarationCS
+defExpressionCS              ::= simpleNameCS EQ OclExpressionCS
+                                 |
+                                 simpleNameCS COLON typeCS EQ OclExpressionCS
                                  |
                                  operationCS EQ OclExpressionCS;
 
@@ -343,29 +416,32 @@ variableDeclarationListCS    ::= VariableDeclarationCS
                                  VariableDeclarationCS COMA variableDeclarationListCS;
 
 
-OclMessageExpCS              ::= OclExpressionCS DOUBLE_CUP simpleNameCS LPAREN RPAREN
+// cahnged: added LeafOclExpressionCS
+OclMessageExpCS              ::= LeafOclExpressionCS DOUBLE_CUP simpleNameCS LPAREN RPAREN
                                  |
-                                 OclExpressionCS DOUBLE_CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN
+                                 LeafOclExpressionCS DOUBLE_CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN
                                  |
-                                 OclExpressionCS CUP simpleNameCS LPAREN RPAREN
+                                 LeafOclExpressionCS CUP simpleNameCS LPAREN RPAREN
                                  |
-                                 OclExpressionCS CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN;
+                                 LeafOclExpressionCS CUP simpleNameCS LPAREN OclMessageArgumentsCS RPAREN;
 
 
 IfExpCS                      ::= IF OclExpressionCS THEN OclExpressionCS ELSE OclExpressionCS ENDIF;
 
-
-LetExpCS                     ::= LET VariableDeclarationCS LetExpSubCS;
+// changed: simplified
+LetExpCS                     ::= LET variableDeclarationListCS IN OclExpressionCS;
 
 
 VariableExpCS                ::= simpleNameCS
                                  |
-                                 SELF;
+                                 SELF
+                                 ;
 
 
 CallExpCS                    ::= FeatureCallExpCS
                                  |
-                                 LoopExpCS;
+                                 LoopExpCS
+                                 ;
 
 
 LiteralExpCS                 ::= EnumLiteralExpCS
@@ -375,17 +451,19 @@ LiteralExpCS                 ::= EnumLiteralExpCS
                                  TupleLiteralExpCS
                                  |
                                  PrimitiveLiteralExpCS
-                                 |
-                                 TypeLiteralExpCS;
+                                 //| cahnged: no such rule in ocl.js
+                                 //TypeLiteralExpCS
+                                 ;
 
 
 VariableDeclarationCS        ::= simpleNameCS
                                  |
                                  simpleNameCS EQ OclExpressionCS
                                  |
-                                 simpleNameCS COLON typeCS EQ OclExpressionCS
+                                 simpleNameCS COLON typeCS // changed: added rule
                                  |
-                                 simpleNameCS COLON typeCS EQ OclExpressionCS;
+                                 simpleNameCS COLON typeCS EQ OclExpressionCS
+                                 ;
 
 
 // Level 7
@@ -393,12 +471,12 @@ OclMessageArgumentsCS        ::= OclMessageArgCS
                                  |
                                  OclMessageArgCS COMA OclMessageArgumentsCS;
 
+// changed: unused
+//LetExpSubCS                  ::= COMA VariableDeclarationCS LetExpSubCS
+//                                 |
+//                                 IN OclExpressionCS;
 
-LetExpSubCS                  ::= COMA VariableDeclarationCS LetExpSubCS
-                                 |
-                                 IN OclExpressionCS;
-
-
+// changed: IteratorExpCS strange rule
 LoopExpCS                    ::= IteratorExpCS
                                  |
                                  IterateExpCS;
@@ -408,7 +486,7 @@ FeatureCallExpCS             ::= OperationCallExpCS
                                  |
                                  PropertyCallExpCS
                                  |
-                                 NavigationCallExpCS;
+                                 AssociationClassCallExpCS; // changed: moved from NavigationCallExpCS
 
 
 EnumLiteralExpCS             ::= pathNameCS DOUBLECOLON simpleNameCS;
@@ -426,8 +504,10 @@ PrimitiveLiteralExpCS        ::= IntegerLiteralExpCS
                                  StringLiteralExpCS
                                  |
                                  BooleanLiteralExpCS
+                                 //|
+                                 //UnlimitedNaturalLiteralExpCS
                                  |
-                                 UnlimitedNaturalLiteralExpCS
+                                 STAR // cahnged: replace of UnlimitedNaturalLiteralExpCS
                                  |
                                  NullLiteralExpCS
                                  |
@@ -448,81 +528,103 @@ OclMessageArgCS              ::= QUESTION_SIGN
                                  OclExpressionCS;
 
 
-IteratorExpCS                ::= OclExpressionCS ARROW simpleNameCS LPAREN OclExpressionCS RPAREN
+// changed: very strange rule
+IteratorExpCS                ::= LeafOclExpressionCS ARROW FORALL LPAREN OclExpressionCS RPAREN
                                  |
-                                 OclExpressionCS ARROW simpleNameCS LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
+                                 LeafOclExpressionCS ARROW FORALL
+                                 LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
                                  |
-                                 OclExpressionCS ARROW simpleNameCS LPAREN VariableDeclarationCS COMA VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
+                                 LeafOclExpressionCS ARROW FORALL
+                                 LPAREN VariableDeclarationCS COMA VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
                                  |
-                                 OclExpressionCS DOT LPAREN simpleNameCS LPAREN RPAREN
+                                 LeafOclExpressionCS ARROW EXISTS LPAREN OclExpressionCS RPAREN
                                  |
-                                 OclExpressionCS DOT LPAREN simpleNameCS LPAREN argumentsCS RPAREN
+                                 LeafOclExpressionCS ARROW EXISTS
+                                 LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
                                  |
-                                 OclExpressionCS DOT simpleNameCS
+                                 LeafOclExpressionCS ARROW EXISTS
+                                 LPAREN VariableDeclarationCS COMA VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
+                                 //|
+                                 //OclExpressionCS DOT LPAREN simpleNameCS LPAREN RPAREN
+                                 //|
+                                 //OclExpressionCS DOT LPAREN simpleNameCS LPAREN argumentsCS RPAREN
+                                 //|
+                                 //OclExpressionCS DOT simpleNameCS
+                                 //|
+                                 //OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
+                                 ;
+
+// changed: added LeafOclExpressionCS
+IterateExpCS                 ::= LeafOclExpressionCS ARROW ITERATE
+                                 LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
                                  |
-                                 OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET;
+                                 LeafOclExpressionCS ARROW ITERATE
+                                 LPAREN VariableDeclarationCS SEMICOLON VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN;
 
 
-IterateExpCS                 ::= OclExpressionCS ARROW ITERATE LPAREN VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN
-                                 |
-                                 OclExpressionCS ARROW ITERATE LPAREN VariableDeclarationCS SEMICOLON VariableDeclarationCS OR_SYMBOL OclExpressionCS RPAREN;
 
-
-OperationCallExpCS           ::= OclExpressionCS simpleNameCS OclExpressionCS
+OperationCallExpCS           ::= //OclExpressionCS simpleNameCS OclExpressionCS changed: strange rule
+                                 //|
+                                 LeafOclExpressionCS ARROW simpleNameCS LPAREN RPAREN
                                  |
-                                 OclExpressionCS ARROW simpleNameCS LPAREN RPAREN
-                                 |
-                                 OclExpressionCS ARROW simpleNameCS LPAREN argumentsCS RPAREN
-                                 |
-                                 OclExpressionCS DOT simpleNameCS LPAREN RPAREN
-                                 |
-                                 OclExpressionCS DOT simpleNameCS LPAREN argumentsCS RPAREN
+                                 LeafOclExpressionCS ARROW simpleNameCS LPAREN argumentsCS RPAREN
+                                 //|
+                                 //LeafOclExpressionCS DOT simpleNameCS LPAREN RPAREN
+                                 //|
+                                 //LeafOclExpressionCS DOT simpleNameCS LPAREN argumentsCS RPAREN
                                  |
                                  simpleNameCS LPAREN RPAREN
                                  |
                                  simpleNameCS LPAREN argumentsCS RPAREN
-                                 |
-                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS LPAREN RPAREN
-                                 |
-                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN
+                                 //|
+                                 //LeafOclExpressionCS DOT simpleNameCS isMarkedPreCS LPAREN RPAREN
+                                 //|
+                                 //LeafOclExpressionCS DOT simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN
                                  |
                                  simpleNameCS isMarkedPreCS LPAREN RPAREN
                                  |
                                  simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN
                                  |
-                                 pathNameCS LPAREN RPAREN
-                                 |
-                                 pathNameCS LPAREN argumentsCS RPAREN
-                                 |
-                                 simpleNameCS OclExpressionCS
-                                 |
-                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS LPAREN RPAREN
-                                 |
-                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS LPAREN argumentsCS RPAREN
-                                 |
-                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS isMarkedPreCS LPAREN RPAREN
-                                 |
-                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS isMarkedPreCS LPAREN argumentsCS RPAREN;
+                                 //pathNameCS LPAREN RPAREN changed: conflict with "simpleNameCS LPAREN RPAREN", maybe wrong
+                                 //|
+                                 //pathNameCS LPAREN argumentsCS RPAREN
+                                 //|
 
+                                 //simpleNameCS OclExpressionCS changed: strange rule
+                                 //|
 
-NavigationCallExpCS          ::= PropertyCallExpCS
+                                 // changed: conflict (pathNameCS DOUBLECOLON simpleNameCS = pathNameCS)
+                                 LeafOclExpressionCS DOT pathNameCS LPAREN RPAREN
                                  |
-                                 AssociationClassCallExpCS;
+                                 LeafOclExpressionCS DOT pathNameCS LPAREN argumentsCS RPAREN
+                                 //|
+                                 //LeafOclExpressionCS DOT pathNameCS isMarkedPreCS LPAREN RPAREN
+                                 //|
+                                 //LeafOclExpressionCS DOT pathNameCS isMarkedPreCS LPAREN argumentsCS RPAREN
+                                 ;
 
+// changed: removed, now part of FeatureCallExpCS
+//NavigationCallExpCS          ::= PropertyCallExpCS
+//                                 |
+//                                 AssociationClassCallExpCS;
 
-PropertyCallExpCS            ::= OclExpressionCS DOT simpleNameCS
+// changed: added LeafOclExpressionCS
+PropertyCallExpCS            ::= LeafOclExpressionCS DOT simpleNameCS
                                  |
-                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS
-                                 |
-                                 simpleNameCS
-                                 |
-                                 simpleNameCS isMarkedPreCS
-                                 |
-                                 pathNameCS
-                                 |
-                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS
-                                 |
-                                 OclExpressionCS DOT pathNameCS DOUBLECOLON simpleNameCS isMarkedPreCS;
+                                 LeafOclExpressionCS DOT simpleNameCS isMarkedPreCS
+                                 //| changed: conflict with VariableExpCS
+                                 //simpleNameCS
+                                 //|
+                                 //simpleNameCS isMarkedPreCS
+
+                                 //|
+                                 //pathNameCS changed: conflict with simpleNameCS
+                                 //|
+                                 // changed: conflict (pathNameCS DOUBLECOLON simpleNameCS = pathNameCS)
+                                 //LeafOclExpressionCS DOT pathNameCS
+                                 //|
+                                 //LeafOclExpressionCS DOT pathNameCS isMarkedPreCS
+                                 ;
 
 
 CollectionLiteralPartsCS     ::= CollectionLiteralPartCS
@@ -563,22 +665,26 @@ argumentsCS                  ::= OclExpressionCS
 
 isMarkedPreCS                ::= AT PRE;
 
-
-AssociationClassCallExpCS    ::= OclExpressionCS DOT simpleNameCS
+// changed: conflicts with PropertyCallExpCS
+AssociationClassCallExpCS    ::= LeafOclExpressionCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
                                  |
-                                 OclExpressionCS DOT simpleNameCS isMarkedPreCS
-                                 |
-                                 OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
-                                 |
-                                 OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS
-                                 |
-                                 simpleNameCS
-                                 |
-                                 simpleNameCS isMarkedPreCS
-                                 |
-                                 simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
-                                 |
-                                 simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS;
+                                 LeafOclExpressionCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS
+                                 //OclExpressionCS DOT simpleNameCS
+                                 //|
+                                 //OclExpressionCS DOT simpleNameCS isMarkedPreCS
+                                 //|
+                                 //OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
+                                 //|
+                                 //OclExpressionCS DOT simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS
+                                 //|
+                                 //simpleNameCS
+                                 //|
+                                 //simpleNameCS isMarkedPreCS
+                                 //|
+                                 //simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET
+                                 //|
+                                 //simpleNameCS LSQUARE_BRACKET argumentsCS RSQUARE_BRACKET isMarkedPreCS
+                                 ;
 
 
 CollectionLiteralPartCS      ::= CollectionRangeCS
@@ -590,5 +696,3 @@ CollectionLiteralPartCS      ::= CollectionRangeCS
 CollectionRangeCS            ::= OclExpressionCS DOUBLEDOT OclExpressionCS;
 
 ExpressionInOclCS            ::= OclExpressionCS;
-
-simpleName ::=  NAME;

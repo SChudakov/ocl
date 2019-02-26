@@ -33,13 +33,7 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 Comment        = "--" {InputCharacter}* {LineTerminator}?
 
 /*identifier*/
-identifier = [a-z][A-Za-z_0-9]*
-
-/*typename*/
-typename = [A-Z][A-Za-z_0-9]*
-
-/*name*/
-name = [a-zA-Z ][a-zA-Z0-9 ]*
+identifier = [A-Za-z_][A-Za-z_0-9]*
 
 /*number literal*/
 integer_literal = ([+-]?[1-9]\d*|0)
@@ -68,7 +62,6 @@ boolean_literal = true | false
     "["                { printString(); return symbol(OCLSymbol.LSQUARE_BRACKET); }
     "]"                { printString(); return symbol(OCLSymbol.RSQUARE_BRACKET); }
 
-    "\'"               { printString(); return symbol(OCLSymbol.SINGLE_QUOTE); }
     "_"                { printString(); return symbol(OCLSymbol.UNDERSCORE); }
 
     "+"                { printString(); return symbol(OCLSymbol.PLUS); }
@@ -83,8 +76,6 @@ boolean_literal = true | false
     "="                { printString(); return symbol(OCLSymbol.EQ); }
     "<>"               { printString(); return symbol(OCLSymbol.NEQ); }
 
-    "=="               { printString(); return symbol(OCLSymbol.EQEQ); }
-
     "and"              { printString(); return symbol(OCLSymbol.AND); }
     "or"               { printString(); return symbol(OCLSymbol.OR); }
     "not"              { printString(); return symbol(OCLSymbol.NOT); }
@@ -95,7 +86,6 @@ boolean_literal = true | false
     "."                { printString(); return symbol(OCLSymbol.DOT); }
     "->"               { printString(); return symbol(OCLSymbol.ARROW); }
     "::"               { printString(); return symbol(OCLSymbol.DOUBLECOLON); }
-    "#"                { printString(); return symbol(OCLSymbol.HASHTAG); }
     ".."               { printString(); return symbol(OCLSymbol.DOUBLEDOT); }
     "@"                { printString(); return symbol(OCLSymbol.AT); }
 
@@ -107,6 +97,9 @@ boolean_literal = true | false
     "implies"          { printString(); return symbol(OCLSymbol.IMPLIES); }
 
     "iterate"          { printString(); return symbol(OCLSymbol.ITERATE); }
+    "forall"          { printString(); return symbol(OCLSymbol.FORALL); }
+    "exists"          { printString(); return symbol(OCLSymbol.EXISTS); }
+
     "mod"              { printString(); return symbol(OCLSymbol.MOD); }
     "div"              { printString(); return symbol(OCLSymbol.DIV); }
 
@@ -116,7 +109,6 @@ boolean_literal = true | false
     "pre"              { printString(); return symbol(OCLSymbol.PRE); }
     "post"             { printString(); return symbol(OCLSymbol.POST); }
 
-    "attr"             { printString(); return symbol(OCLSymbol.ATTR); }
     "body"             { printString(); return symbol(OCLSymbol.BODY); }
 
     "def"              { printString(); return symbol(OCLSymbol.DEF); }
@@ -131,7 +123,6 @@ boolean_literal = true | false
     "endpackage"       { printString(); return symbol(OCLSymbol.ENDPACKAGE); }
 
     "in"               { printString(); return symbol(OCLSymbol.IN); }
-    "oper"             { printString(); return symbol(OCLSymbol.OPER); }
 
     "init"             { printString(); return symbol(OCLSymbol.INIT); }
     "derive"             { printString(); return symbol(OCLSymbol.DERIVE); }
@@ -168,10 +159,6 @@ boolean_literal = true | false
     "invalid"                { printString(); return symbol(OCLSymbol.INVALID); }
 
     {identifier}             { printString(); return symbol(OCLSymbol.IDENTIFIER, yytext()); }
-
-    {typename}               { printString(); return symbol(OCLSymbol.TYPENAME, yytext()); }
-
-    {name}                   { printString(); return symbol(OCLSymbol.NAME, yytext()); }
 
     {integer_literal}          { printString(); return symbol(OCLSymbol.INTEGER_LITERAL, Integer.valueOf(yytext()));}
 

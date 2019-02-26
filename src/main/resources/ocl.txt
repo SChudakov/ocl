@@ -1,91 +1,140 @@
-context Personne
- inv : enfants->forall( e | e.age < self.age - 7)
- inv : enfants->forall( e : Personne | e.age < self.age - 7)
- inv i3 : enfants->forall( e1,e2 : Personne | e1 <> e2 implies e1.prenom <> e2.prenom)
- inv i4 : self.enfants -> isUnique ( prenom )
- def cousins : Set(Personne) = parents.parents.enfants.enfants->excluding(parents.enfants )->asSet()
+package Company
 
-context Personne::age : Integer
- init : 0
+context Company
+inv: self.numberOfEmployees > 50
 
-context Personne::estMarrie : Boolean
- derive : conjoint->notEmpty()
+context Company inv:
+self.numberOfEmployees > 50
 
-context Personne::salaire() : Integer
- post : return > 5000
+context Person::income2 : Integer
+init:   (parents.income2->sum() * 1/100).round() -- pocket allowance
+derive:  if underAge
+      then (parents.income2->sum() * 1/100).round()
+      else job.salary->sum()
+      endif
 
-context Compagnie::embaucheEmploye( p : Personne)
- pre pasPresent : not (employes->includes(p))
- post embauche : employes->includes(p)
 
-context Personne::grandsParents() : Set(Personne)
- body : parents.parents->asSet()
 
-( age < 40 implies salaire > 1000 ) and ( age >=40 implies salaire>2000)
+context Person
+def: income : Integer = self.Job.salary->sum()
+def: nickname : String = 'Little Red Rooster'
+def: hasTitle(t : String) : Boolean = self.Job->exists(tile:String | title = t)
 
-if age<40 then salaire > 1000 else salaire > 2000 endif
 
-salaire > (if age<40 then 1000 else 2000 endif)
+context Person inv:
+self.age > 0
 
-nom = nom.substring(1,1).toUpper().concat(nom.substring(2,nom.size()).toLower())
 
-epouse->notEmpty() implies epouse.sexe = Sexe::Feminin
+context Company inv:
+self.stockPrice() > 0
 
-Set { 3, 5, 2, 45, 5 }->size()
 
-Sequence { 1, 2, 45, 9, 3, 9 } ->count(9)
+context Company
+inv: self.manager.isUnemployed = false
+inv: self.employee->notEmpty()
 
-Sequence { 1, 2, 45, 2, 3, 9 } ->includes(45)
 
-Bag { 1, 9, 9, 1 } -> count(9)
+context Person inv:
+self.employer->size() < 3
 
-c->asSet()->size() = c->size()
 
-c->count(x) = 0
+context Person inv:
+self.employer->isEmpty()
 
-Bag { 1, 9, 0, 1, 2, 9, 1 } -> includesAll( Bag{ 9,1,9} )
 
-self.enfants ->select( age>10 and sexe = Sexe::Masculin)
-self.enfants ->reject(enfants->isEmpty())->notEmpty()
+context Company inv:
+self.manager->size() = 1
 
-membres->any(titre='president')
 
-self.employe->select(age > 50)
-self.employe->select( p | p.age>50 )
-self.employe->select( p : Personne | p.age>50)
-self.enfants->forall(age<10)
-self.enfants->exists(sexe=Sexe::Masculin)
-self.enfants->one(age>=18)self.enfants->forall( age < self.age )
-self.enfants->forall( e | e.age < self.age - 7)
-self.enfants->forall( e : Personne | e.age < self.age - 7)
-self.enfants->exists( e1,e2 | e1.age = e2.age )
-self.enfants->forall( e1,e2 : Personne |e1 <> e2 implies e1.prenom <> e2.prenom)
-self.enfants -> isUnique ( prenom )
-self.enfants->collect(age) = Bag{10,5,10,7}
-self.employes->collect(salaire/10)->sum()
-self.enfants.enfants.voitures
+context Company inv:
+self.manager.age > 40
 
-enfants.enfants.prenom = Bag{ 'pierre', 'paul', 'marie', 'paul' }
-enfants->collectNested(enfants.prenom) = Bag { Bag{'pierre', 'paul'}, Bag{'marie','paul'}
 
-Sequence{1..s->size()-1} -> forall(i | s.at(i) < s.at(i+1) )
+context Person inv:
+self.wife->notEmpty() implies self.wife.gender = Gender::female
 
-enfants->sortedBy( age )
-enfants->sortedBy( enfants->size() )->last()
 
-let ages = enfants.age->sortedBy(a | a) in ages.last() - ages.first()
+context Person inv:
+self.wife->notEmpty() implies self.wife.age >= 18 and
+self.husband->notEmpty() implies self.husband.age >= 18
 
-s.Emploi
-p.Emploi
-s.Emploi->collect(salaire)->sum()
-s.Emploi.salaire->forall(x | x>500)
 
-p.Evaluation[chefs]
-p.Evaluation[employes]
-p.Evaluation[chefs].note -> sum()s.Emploi-> select(salaire<1000).employe
+context Company inv:
+self.employee->size() <= 50
 
-p.enfants->select(oclIsKindOf(Femme)).asTypeOf(Set(Femme)) ->select(nomDeJF <> nom)
 
-Personne.allInstances->size() < 500
-Personne.allInstances->forall(p1,p2 | p1<>p2 implies p1.numsecu <> p2.numsecu)
-Personne.allInstances->isUnique(numsecu)
+context Person inv:
+self.Job->size() <= 2
+
+
+context Job
+inv: self.employer.numberOfEmployees >= 1
+inv: self.employee.age > 21
+
+
+context Bank inv:
+not self.customer->exists(underAge = true)
+
+
+context Person inv:
+self.allInstances()->forAll(p1:Person, p2:Person |
+                                 p1 <> p2 implies
+                                 p1.lastName <> p2.lastName)
+
+
+context Company inv:
+self.employee->select(e:Person | e.age > 50)->notEmpty()
+
+
+context Company inv:
+self.employee->select(e:Person | e.age > 50)->notEmpty()
+context Company inv:
+self.employee->select(p: Person | p.age > 50)->notEmpty()
+
+
+context Company inv:
+self.employee->select(p : Person | p.age > 50)->notEmpty()
+
+
+context Company inv:
+self.employee->reject( p:Person | p.isMarried )->isEmpty()
+
+
+
+
+inv: self.employee->collect(p:Person | p.birthDate)->size() > 0
+inv: self.employee.birthDate->size() > 0
+
+
+context Company
+inv:     self.employee->forAll(p:Person | p.age <= 65 )
+inv:     self.employee->forAll( p:Person | p.age <= 65 )
+inv:     self.employee->forAll( p : Person | p.age <= 65 )
+
+
+context Company inv:
+self.employee->forAll( e1 :Person , e2 : Person |
+                 e1 <> e2 implies e1.firstName <> e2.firstName)
+
+
+context Company inv:
+self.employee->forAll (e1 :Person | self.employee->forAll (e2:Person |
+                   e1 <> e2 implies e1.firstName <> e2.firstName))
+
+
+context Company inv:
+self.employee->exists( p:Person | p.firstName = 'Jack' )
+
+
+context Company inv:
+self.employee->exists( p :Person | p.firstName = 'Jack' )
+context Company inv:
+self.employee->exists( p : Person | p.firstName = 'Jack' )
+
+
+context Person inv:
+employer->forAll( e:Company | e.employee->exists( p:Person|p.lastName = e.name) )
+context Person
+inv: employer->forAll( c:Company | c.employee->exists( p : Person | p.lastName = c.name) )
+
+endpackage
