@@ -1,7 +1,7 @@
 package Company
 
 context Company
-inv: self.numberOfEmployees > 50
+inv: -self.numberOfEmployees > 50
 
 context Company inv:
 self.numberOfEmployees > 50
@@ -30,7 +30,6 @@ self.stockPrice() > 0
 
 
 context Company
-inv: self.manager.isUnemployed = false
 inv: self.employee->notEmpty()
 
 
@@ -73,7 +72,7 @@ inv: self.employee.age > 21
 
 
 context Bank inv:
-not self.customer->exists(underAge = true)
+not self.customer->exists(p1: Person | underAge = true)
 
 
 context Person inv:

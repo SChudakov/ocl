@@ -41,9 +41,6 @@ integer_literal = ([+-]?[1-9]\d*|0)
 /*real number*/
 real_literal = [0-9]+(\\.[0-9]+)?
 
-/*boolean literal*/
-boolean_literal = true | false
-
 
 %state STRING_LITERAL
 
@@ -98,7 +95,11 @@ boolean_literal = true | false
 
     "iterate"          { printString(); return symbol(OCLSymbol.ITERATE); }
     "forall"          { printString(); return symbol(OCLSymbol.FORALL); }
+    "forAll"          { printString(); return symbol(OCLSymbol.FORALL); }
     "exists"          { printString(); return symbol(OCLSymbol.EXISTS); }
+    "select"          { printString(); return symbol(OCLSymbol.SELECT); }
+    "reject"          { printString(); return symbol(OCLSymbol.REJECT); }
+    "collect"          { printString(); return symbol(OCLSymbol.COLLECT); }
 
     "mod"              { printString(); return symbol(OCLSymbol.MOD); }
     "div"              { printString(); return symbol(OCLSymbol.DIV); }
@@ -163,8 +164,6 @@ boolean_literal = true | false
     {integer_literal}          { printString(); return symbol(OCLSymbol.INTEGER_LITERAL, Integer.valueOf(yytext()));}
 
     {real_literal}             { printString(); return symbol(OCLSymbol.REAL_LITERAL, Double.valueOf(yytext()));}
-
-    {boolean_literal}          { printString(); return symbol(OCLSymbol.BOOLEAN_LITERAL, Boolean.valueOf(yytext()));}
 
     {Comment}          { printString();  }
 
