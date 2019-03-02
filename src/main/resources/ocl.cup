@@ -1,5 +1,4 @@
 import java_cup.runtime.*;
-import com.ocl.scanner.CalculatorScanner;
 
 /* -----------------Parser Code Section----------------- */
 
