@@ -36,7 +36,8 @@ Comment        = "--" {InputCharacter}* {LineTerminator}?
 identifier = [A-Za-z_][A-Za-z_0-9]*
 
 /*number literal*/
-integer_literal = ([+-]?[1-9]\d*|0)
+/*integer_literal = ([+-]?[1-9]\d*|0)*/
+integer_literal = ([1-9]\d*|0)
 
 /*real number*/
 real_literal = [0-9]+(\\.[0-9]+)?
@@ -94,12 +95,15 @@ real_literal = [0-9]+(\\.[0-9]+)?
     "implies"          { printString(); return symbol(OCLSymbol.IMPLIES); }
 
     "iterate"          { printString(); return symbol(OCLSymbol.ITERATE); }
-    "forall"          { printString(); return symbol(OCLSymbol.FORALL); }
     "forAll"          { printString(); return symbol(OCLSymbol.FORALL); }
     "exists"          { printString(); return symbol(OCLSymbol.EXISTS); }
     "select"          { printString(); return symbol(OCLSymbol.SELECT); }
     "reject"          { printString(); return symbol(OCLSymbol.REJECT); }
     "collect"          { printString(); return symbol(OCLSymbol.COLLECT); }
+    "isUnique"          { printString(); return symbol(OCLSymbol.ISUNIQUE); }
+    "any"          { printString(); return symbol(OCLSymbol.ANY); }
+    "one"          { printString(); return symbol(OCLSymbol.ONE); }
+    "sortedBy"          { printString(); return symbol(OCLSymbol.SORTEDBY); }
 
     "mod"              { printString(); return symbol(OCLSymbol.MOD); }
     "div"              { printString(); return symbol(OCLSymbol.DIV); }
