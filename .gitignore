@@ -5,6 +5,10 @@
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
+# Custom project files
+src/main/java/com/ocl/parser/
+src/main/java/com/ocl/scanner/
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -135,6 +139,3 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 # End of https://www.gitignore.io/api/java,linux,maven,intellij+all
-
-src/main/java/com/ocl/parser/
-src/main/java/com/ocl/scanner/
